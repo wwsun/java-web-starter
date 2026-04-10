@@ -58,3 +58,10 @@ logging:
 # ====================================
 knife4j:
   enable: false
+
+# ====================================
+# CORS
+# ====================================
+app:
+  cors:
+    allowed-origins: "${APP_CORS_ALLOWED_ORIGINS}"

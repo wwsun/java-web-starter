@@ -59,3 +59,10 @@ logging:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# ====================================
+# CORS
+# ====================================
+app:
+  cors:
+    allowed-origins: "http://localhost:5173"
