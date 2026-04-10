@@ -5,6 +5,7 @@ import com.music163.starter.module.user.entity.User;
 import com.music163.starter.module.user.mapper.UserMapper;
 import com.music163.starter.module.user.service.impl.UserServiceImpl;
 import com.music163.starter.module.user.vo.UserVO;
+import com.music163.starter.module.user.dto.ChangePasswordRequest;
 import com.music163.starter.security.dto.RegisterRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
@@ -94,6 +94,36 @@ class UserServiceTest {
         given(userMapper.selectByUsername("existing")).willReturn(new User());
 
         assertThatThrownBy(() -> userService.register(request))
+                .isInstanceOf(BusinessException.class);
+    }
+
+    // ===== findByUsername =====
+
+    @Test
+    void findByUsername_notFound_shouldReturnNull() {
+        given(userMapper.selectByUsername("unknown")).willReturn(null);
+
+        User result = userService.findByUsername("unknown");
+
+        assertThat(result).isNull();
+    }
+
+    // ===== changePassword =====
+
+    @Test
+    void changePassword_wrongOldPassword_shouldThrowBusinessException() {
+        ChangePasswordRequest request = new ChangePasswordRequest();
+        request.setOldPassword("wrong-password");
+        request.setNewPassword("newpass123");
+
+        User user = User.builder()
+                .username("testuser")
+                .password("encoded-correct-password")
+                .build();
+        given(userMapper.selectByUsername("testuser")).willReturn(user);
+        given(passwordEncoder.matches("wrong-password", "encoded-correct-password")).willReturn(false);
+
+        assertThatThrownBy(() -> userService.changePassword("testuser", request))
                 .isInstanceOf(BusinessException.class);
     }
 }

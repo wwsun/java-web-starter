@@ -8,6 +8,7 @@ import com.music163.starter.common.result.ResultCode;
 import com.music163.starter.module.user.entity.User;
 import com.music163.starter.module.user.mapper.UserMapper;
 import com.music163.starter.module.user.service.UserService;
+import com.music163.starter.module.user.dto.ChangePasswordRequest;
 import com.music163.starter.security.dto.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,5 +59,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @CacheEvict(value = "user", key = "#entity.username")
     public boolean save(User entity) {
         return super.save(entity);
+    }
+
+    @Override
+    @CacheEvict(value = "user", key = "#username")
+    public void changePassword(String username, ChangePasswordRequest request) {
+        User user = findByUsername(username);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new BusinessException(ResultCode.INVALID_CREDENTIALS);
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        updateById(user);
     }
 }
