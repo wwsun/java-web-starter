@@ -1,0 +1,60 @@
+# ====================================
+# Production Environment
+# ====================================
+spring:
+  # DataSource (from environment variables)
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      minimum-idle: 10
+      maximum-pool-size: 30
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+
+  # Redis (from environment variables)
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${SPRING_DATA_REDIS_PASSWORD:}
+      database: 0
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 2
+
+  # Cache
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000
+      key-prefix: "starter:"
+      use-key-prefix: true
+
+# ====================================
+# JWT Configuration (from environment)
+# ====================================
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: 3600000
+  refresh-token-expiration: 604800000
+
+# ====================================
+# Logging
+# ====================================
+logging:
+  level:
+    root: WARN
+    com.music163.starter: INFO
+
+# ====================================
+# Knife4j - disable in production
+# ====================================
+knife4j:
+  enable: false
