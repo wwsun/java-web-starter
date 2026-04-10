@@ -10,7 +10,7 @@
 
 | 优先级 | 改进项 | 说明 |
 |--------|--------|------|
-| P0 | 轻量角色字段 | `users.role` 单字段 + `@PreAuthorize` 示范，提供最小可用授权范本 |
+| P0 | RBAC 权限体系 | 补全角色/权限模型，提供候选人可参考的授权范本 |
 | P0 | 前端 Vitest 单元测试 | 引入测试框架并提供示范测试文件 |
 | P0 | Playwright E2E 测试 | 提供完整登录流程的端到端测试示范 |
 | P1 | 安全问题修复 | 修复 CORS 过宽、Token 未自动刷新、Dockerfile JRE 版本错误 |
@@ -20,40 +20,61 @@
 
 ---
 
-## 第一节：轻量角色字段
+## 第一节：RBAC 权限体系
 
-不新增表，只在现有 `users` 表追加一个 `role` 字段，提供最小可用的授权示范。
+### 数据库模型
 
-### 数据库变更
+新增 2 张表，与现有 `users` 表组成简洁 RBAC：
 
 ```sql
--- 在 users 表新增字段
-ALTER TABLE users ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'USER' COMMENT '角色：ADMIN / USER';
+-- 角色表
+CREATE TABLE roles (
+    id   BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(50) NOT NULL UNIQUE COMMENT '角色编码，如 ADMIN / USER'
+);
 
--- 将默认 admin 账号设为管理员
-UPDATE users SET role = 'ADMIN' WHERE username = 'admin';
+-- 用户-角色关联表
+CREATE TABLE user_roles (
+    user_id BIGINT NOT NULL,
+    role_id BIGINT NOT NULL,
+    PRIMARY KEY (user_id, role_id)
+);
 ```
 
-`init.sql` 中同步更新：建表语句加入 `role` 字段，admin 初始化数据设为 `ADMIN`。
+**初始化数据**：
+- 角色：`ADMIN`（管理员）、`USER`（普通用户）
+- 默认 `admin` 账号分配 `ADMIN` 角色
+- 新注册用户默认分配 `USER` 角色
 
 ### 后端实现
 
-**不新增模块**，仅修改已有文件：
+**新增模块** `module/role/`：
 
-- `User.java`：新增 `private String role;` 字段
-- `UserVO.java`：新增 `role` 字段（通过 `from()` 方法带出）
-- `CustomUserDetailsService`：将 `user.getRole()` 作为 `SimpleGrantedAuthority` 填入
+```
+module/role/
+├── controller/RoleController.java   # GET /roles, POST /users/{id}/roles
+├── service/RoleService.java
+├── service/impl/RoleServiceImpl.java
+├── mapper/RoleMapper.java
+├── entity/Role.java
+├── dto/AssignRoleRequest.java
+└── vo/RoleVO.java
+```
+
+**安全层变更**：
+- `CustomUserDetailsService`：加载用户时联表查询角色，填入 `SimpleGrantedAuthority("ROLE_" + code)`
 - `SecurityConfig`：添加 `@EnableMethodSecurity` 注解
 - `UserController.deleteUser`：添加 `@PreAuthorize("hasRole('ADMIN')")` 作为示范
+- `UserVO`：新增 `roles: List<String>` 字段（角色 code 列表）
 
-**注册规则**：新用户默认 `role = USER`，后续候选人可按需扩展字段值或升级为多角色模型。
+**不引入**：自定义注解，直接使用 Spring Security 原生 `@PreAuthorize`，更标准。
 
 ### 前端实现
 
-- `useAuthStore`：登录后调用 `/api/users/me`，将 `role: string` 存入 store
-- 新增 `hooks/useRole.ts`：`useRole(role: string): boolean`，检查当前用户是否具有指定角色
-- `RequireAuth` 组件：增加可选 `requiredRole?: string` 属性，无权限时跳转 `/403` 页面（新增简单 403 页面）
-- `DashboardPage`：增加"用户管理"入口，使用 `useRole('ADMIN')` 控制显隐，作为示范
+- `useAuthStore`：登录后调用 `/api/users/me`，将 `roles` 字段存入 store
+- 新增 `hooks/usePermission.ts`：`usePermission(role: string): boolean`
+- `RequireAuth` 组件：增加可选 `requiredRole?: string` 属性，无权限时重定向 403 页面
+- `DashboardPage`：增加"用户管理"入口，使用 `usePermission('ADMIN')` 控制显隐，作为示范
 
 ---
 
@@ -237,12 +258,12 @@ ER 图或字段表，说明表名、字段、约束、索引。
 
 | 文件 | 变更类型 |
 |------|----------|
-| `doc/sql/init.sql` | 修改：`users` 表新增 `role` 字段，admin 初始值设为 `ADMIN` |
-| `module/user/entity/User.java` | 修改：新增 `role` 字段 |
-| `module/user/vo/UserVO.java` | 修改：新增 `role` 字段 |
-| `security/CustomUserDetailsService.java` | 修改：将 role 字段作为 GrantedAuthority 加载 |
+| `doc/sql/init.sql` | 修改：追加 RBAC 建表语句和初始化数据 |
+| `module/role/**` | 新增：角色模块（7 个文件） |
+| `module/user/vo/UserVO.java` | 修改：新增 `roles` 字段 |
+| `security/CustomUserDetailsService.java` | 修改：加载角色和权限 |
 | `security/SecurityConfig.java` | 修改：启用 `@EnableMethodSecurity`，收紧 CORS |
-| `module/user/controller/UserController.java` | 修改：`deleteUser` 加 `@PreAuthorize("hasRole('ADMIN')")` |
+| `module/user/controller/UserController.java` | 修改：`deleteUser` 加 `@PreAuthorize` |
 | `resources/application-dev.yml` | 修改：新增 `app.cors.allowed-origins` |
 | `resources/application-prod.yml` | 修改：新增 `app.cors.allowed-origins` |
 | `Dockerfile` | 修改：JRE 11 → JRE 21 |
@@ -251,15 +272,15 @@ ER 图或字段表，说明表名、字段、约束、索引。
 
 | 文件 | 变更类型 |
 |------|----------|
-| `stores/useAuthStore.ts` | 修改：新增 `role` 字段 |
-| `hooks/useRole.ts` | 新增 |
+| `stores/useAuthStore.ts` | 修改：新增 `roles` 字段 |
+| `hooks/usePermission.ts` | 新增 |
 | `router/index.tsx` | 修改：`RequireAuth` 支持 `requiredRole` |
 | `pages/DashboardPage.tsx` | 修改：新增管理员入口示范 |
 | `api/client.ts` | 修改：401 自动刷新逻辑 |
 | `vite.config.ts` | 修改：新增 vitest 配置 |
 | `playwright.config.ts` | 新增 |
 | `stores/useAuthStore.test.ts` | 新增 |
-| `hooks/useRole.test.ts` | 新增 |
+| `hooks/usePermission.test.ts` | 新增 |
 | `pages/LoginPage.test.tsx` | 新增 |
 | `e2e/auth.spec.ts` | 新增 |
 | `package.json` | 修改：新增测试脚本和依赖 |
