@@ -54,6 +54,7 @@ export default function MainLayout() {
         <div className="p-4 border-t border-slate-800">
           <button
             onClick={handleLogout}
+            data-testid="logout-btn"
             className="w-full flex items-center px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all cursor-pointer"
           >
             <span className="mr-3">🚪</span>

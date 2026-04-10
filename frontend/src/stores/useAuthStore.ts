@@ -4,7 +4,9 @@ interface AuthState {
   token: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
+  roles: string[];
   setTokens: (accessToken: string, refreshToken: string) => void;
+  setRoles: (roles: string[]) => void;
   logout: () => void;
 }
 
@@ -16,24 +18,21 @@ export const useAuthStore = create<AuthState>((set) => ({
   token: localStorage.getItem('access_token'),
   refreshToken: localStorage.getItem('refresh_token'),
   isAuthenticated: !!localStorage.getItem('access_token'),
+  roles: [],
 
   setTokens: (accessToken: string, refreshToken: string) => {
     localStorage.setItem('access_token', accessToken);
     localStorage.setItem('refresh_token', refreshToken);
-    set({
-      token: accessToken,
-      refreshToken,
-      isAuthenticated: true,
-    });
+    set({ token: accessToken, refreshToken, isAuthenticated: true });
+  },
+
+  setRoles: (roles: string[]) => {
+    set({ roles });
   },
 
   logout: () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    set({
-      token: null,
-      refreshToken: null,
-      isAuthenticated: false,
-    });
+    set({ token: null, refreshToken: null, isAuthenticated: false, roles: [] });
   },
 }));

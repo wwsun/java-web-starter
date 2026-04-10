@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login as loginApi } from '@/api/auth';
+import { getMe } from '@/api/user';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 export default function LoginPage() {
@@ -10,6 +11,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const setTokens = useAuthStore((s) => s.setTokens);
+  const setRoles = useAuthStore((s) => s.setRoles);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -19,6 +21,8 @@ export default function LoginPage() {
     try {
       const res = await loginApi({ username, password });
       setTokens(res.data.accessToken, res.data.refreshToken);
+      const meRes = await getMe();
+      setRoles(meRes.data.roles);
       navigate('/', { replace: true });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : '登录失败，请重试');

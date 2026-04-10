@@ -53,4 +53,22 @@ export const handlers = [
       },
     });
   }),
+
+  // 当前用户信息（含角色）
+  http.get('/api/users/me', () => {
+    return HttpResponse.json({
+      code: 200,
+      message: '操作成功',
+      data: {
+        id: 1,
+        username: 'admin',
+        nickname: '管理员',
+        email: 'admin@example.com',
+        phone: null,
+        avatar: null,
+        status: 1,
+        roles: ['ADMIN'],
+      },
+    });
+  }),
 ];

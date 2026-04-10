@@ -1,4 +1,7 @@
+import { usePermission } from '@/hooks/usePermission';
+
 export default function DashboardPage() {
+  const isAdmin = usePermission('ADMIN');
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
@@ -50,6 +53,13 @@ export default function DashboardPage() {
               <p className="text-sm text-slate-500 mt-1">{item.desc}</p>
             </div>
           ))}
+          {isAdmin && (
+            <div className="p-4 rounded-lg bg-blue-50 border border-blue-100 hover:bg-blue-100 transition-colors cursor-pointer group">
+              <span className="text-2xl">👤</span>
+              <h3 className="font-medium text-blue-700 mt-2">用户管理</h3>
+              <p className="text-sm text-blue-500 mt-1">管理系统用户，分配角色（仅管理员可见）</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
