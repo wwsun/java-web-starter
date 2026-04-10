@@ -47,8 +47,9 @@ public class AuthController {
 
             String accessToken = jwtTokenProvider.generateAccessToken(authentication);
             String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
+            long expiresIn = jwtTokenProvider.getAccessTokenExpiration() / 1000;
 
-            return Result.success(TokenResponse.of(accessToken, refreshToken, 3600));
+            return Result.success(TokenResponse.of(accessToken, refreshToken, expiresIn));
         } catch (BadCredentialsException e) {
             throw new BusinessException(ResultCode.INVALID_CREDENTIALS);
         }
@@ -83,14 +84,15 @@ public class AuthController {
     public Result<TokenResponse> refresh(@RequestHeader("Authorization") String bearerToken) {
         String token = bearerToken.replace("Bearer ", "");
 
-        if (!jwtTokenProvider.validateToken(token)) {
+        if (!jwtTokenProvider.validateRefreshToken(token)) {
             throw new BusinessException(ResultCode.TOKEN_INVALID);
         }
 
         String username = jwtTokenProvider.getUsernameFromToken(token);
         String newAccessToken = jwtTokenProvider.generateAccessToken(username);
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(username);
+        long expiresIn = jwtTokenProvider.getAccessTokenExpiration() / 1000;
 
-        return Result.success(TokenResponse.of(newAccessToken, newRefreshToken, 3600));
+        return Result.success(TokenResponse.of(newAccessToken, newRefreshToken, expiresIn));
     }
 }
