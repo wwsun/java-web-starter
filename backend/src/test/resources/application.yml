@@ -1,0 +1,22 @@
+# 测试环境覆盖配置
+server:
+  servlet:
+    context-path: /   # 测试中去掉 /api 前缀，MockMvc 路径更简洁
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL;NON_KEYWORDS=USER
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  cache:
+    type: none   # 测试中关闭 Redis 缓存，避免依赖外部服务
+
+jwt:
+  secret: test-secret-key-must-be-at-least-256-bits-long-for-hs256
+  access-token-expiration: 3600000
+  refresh-token-expiration: 604800000
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
