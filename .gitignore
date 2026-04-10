@@ -23,6 +23,7 @@ backend/src/main/resources/static/*
 .classpath
 .project
 .settings/
+.factorypath
 
 # Claude-Code
 .claude/settings.local.json
