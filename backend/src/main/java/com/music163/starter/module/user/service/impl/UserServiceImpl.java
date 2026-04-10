@@ -3,32 +3,55 @@ package com.music163.starter.module.user.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.music163.starter.common.exception.BusinessException;
+import com.music163.starter.common.result.ResultCode;
 import com.music163.starter.module.user.entity.User;
 import com.music163.starter.module.user.mapper.UserMapper;
 import com.music163.starter.module.user.service.UserService;
+import com.music163.starter.security.dto.RegisterRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
  * 用户 Service 实现
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
-    private final UserMapper userMapper;
+    // 注意：不重复注入 UserMapper，通过 ServiceImpl 的 baseMapper 访问
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Cacheable(value = "user", key = "#username", unless = "#result == null")
     public User findByUsername(String username) {
-        return userMapper.selectByUsername(username);
+        return baseMapper.selectByUsername(username);
     }
 
     @Override
     public IPage<User> pageUsers(Page<User> page) {
-        return userMapper.selectPage(page, null);
+        return baseMapper.selectPage(page, null);
+    }
+
+    @Override
+    public void register(RegisterRequest request) {
+        if (baseMapper.selectByUsername(request.getUsername()) != null) {
+            throw new BusinessException(ResultCode.USER_ALREADY_EXISTS);
+        }
+        User user = User.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .nickname(request.getNickname())
+                .email(request.getEmail())
+                .status(1)
+                .build();
+        save(user);
+        log.info("User registered: {}", request.getUsername());
     }
 
     @Override

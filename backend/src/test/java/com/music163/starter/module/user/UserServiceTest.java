@@ -1,14 +1,44 @@
 package com.music163.starter.module.user;
 
+import com.music163.starter.common.exception.BusinessException;
 import com.music163.starter.module.user.entity.User;
+import com.music163.starter.module.user.mapper.UserMapper;
+import com.music163.starter.module.user.service.impl.UserServiceImpl;
 import com.music163.starter.module.user.vo.UserVO;
+import com.music163.starter.security.dto.RegisterRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
 class UserServiceTest {
+
+    @Mock
+    private UserMapper userMapper;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    private UserServiceImpl userService;
+
+    @BeforeEach
+    void setUp() {
+        userService = new UserServiceImpl(passwordEncoder);
+        // 注入 baseMapper（ServiceImpl 的受保护字段）
+        ReflectionTestUtils.setField(userService, "baseMapper", userMapper);
+    }
 
     // ===== toVO =====
 
@@ -35,5 +65,35 @@ class UserServiceTest {
         assertThat(vo.getStatus()).isEqualTo(1);
         assertThat(vo.getCreatedAt()).isEqualTo(LocalDateTime.of(2026, 1, 1, 0, 0));
         // UserVO 无 getPassword() 方法：编译期保证密码不泄露
+    }
+
+    // ===== register =====
+
+    @Test
+    void register_success_shouldEncodePassword() {
+        RegisterRequest request = new RegisterRequest();
+        request.setUsername("newuser");
+        request.setPassword("password123");
+
+        given(userMapper.selectByUsername("newuser")).willReturn(null);
+        given(passwordEncoder.encode("password123")).willReturn("hashed");
+        given(userMapper.insert(argThat((User u) -> u != null))).willReturn(1);
+
+        userService.register(request);
+
+        verify(passwordEncoder).encode("password123");
+        verify(userMapper).insert(argThat((User u) -> "hashed".equals(u.getPassword())));
+    }
+
+    @Test
+    void register_duplicateUsername_shouldThrowBusinessException() {
+        RegisterRequest request = new RegisterRequest();
+        request.setUsername("existing");
+        request.setPassword("password123");
+
+        given(userMapper.selectByUsername("existing")).willReturn(new User());
+
+        assertThatThrownBy(() -> userService.register(request))
+                .isInstanceOf(BusinessException.class);
     }
 }
