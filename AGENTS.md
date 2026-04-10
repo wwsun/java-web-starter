@@ -28,6 +28,9 @@
 
 ## 代码规范
 
+> [!IMPORTANT]
+> **规范优先级**：当《Alibaba Java Coding Guidelines》与本项目特定的规范文档（如 `doc/dev-guide.md`、`doc/api-convention.md`）存在冲突时，**优先遵循本项目特定规范**。
+
 ### 后端
 
 1. **所有实体类使用 Lombok 注解**：`@Data`, `@Builder`, `@RequiredArgsConstructor` 等
@@ -45,6 +48,7 @@
    - 表名和字段名使用 snake_case
    - 逻辑删除字段统一为 `deleted`
    - 时间字段使用 `created_at` / `updated_at`
+6. **通用编码规范**：参考 [Alibaba Java Coding Guidelines](doc/java-coding-guidelines.md)
 
 ### 前端
 

@@ -1,5 +1,11 @@
 # 开发规范
 
+> [!IMPORTANT]
+> **规范优先级**：本项目遵循《Alibaba Java Coding Guidelines》，但当其与本项目特定的 `doc/dev-guide.md` 或 `doc/api-convention.md` 存在差异时，**请务必以本项目文档为准**。例如：
+> - 数据库时间字段请使用 `created_at` / `updated_at` (而非 `gmt_create`)
+> - 数据库表名请使用复数名词 (如 `users`)
+> - 持久层统一使用 `Mapper` 命名 (而非 `DAO`)
+
 ## Git 分支策略
 
 采用简化版 GitFlow：
