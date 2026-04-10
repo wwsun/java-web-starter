@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- Password: admin123 (BCrypt encoded)
 -- -------------------------------------------
 INSERT INTO `users` (`username`, `password`, `nickname`, `status`)
-VALUES ('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', '管理员', 1);
+VALUES ('admin', '$2a$10$k9X1JcFuWv9xw/jT6gSNR.3qCt9NYkOrKphmf6nLxHqgiRPNLCsM.', '管理员', 1);
 
 -- -------------------------------------------
 -- RBAC: roles
