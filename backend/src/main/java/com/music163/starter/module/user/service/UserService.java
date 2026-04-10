@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.music163.starter.module.user.entity.User;
 import com.music163.starter.module.user.dto.ChangePasswordRequest;
+import com.music163.starter.module.user.dto.UpdateUserRequest;
+import com.music163.starter.module.user.vo.UserVO;
 import com.music163.starter.security.dto.RegisterRequest;
 
 /**
@@ -35,4 +37,9 @@ public interface UserService extends IService<User> {
      * @throws com.music163.starter.common.exception.BusinessException 旧密码错误或用户不存在时
      */
     void changePassword(String username, ChangePasswordRequest request);
+
+    /**
+     * 更新用户信息（仅更新非空字段）
+     */
+    UserVO updateUserInfo(String username, UpdateUserRequest request);
 }

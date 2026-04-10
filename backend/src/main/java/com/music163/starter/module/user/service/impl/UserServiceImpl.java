@@ -9,6 +9,8 @@ import com.music163.starter.module.user.entity.User;
 import com.music163.starter.module.user.mapper.UserMapper;
 import com.music163.starter.module.user.service.UserService;
 import com.music163.starter.module.user.dto.ChangePasswordRequest;
+import com.music163.starter.module.user.dto.UpdateUserRequest;
+import com.music163.starter.module.user.vo.UserVO;
 import com.music163.starter.security.dto.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,5 +75,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         updateById(user);
+    }
+
+    @Override
+    @CacheEvict(value = "user", key = "#username")
+    public UserVO updateUserInfo(String username, UpdateUserRequest request) {
+        User user = findByUsername(username);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+        if (org.springframework.util.StringUtils.hasText(request.getNickname())) {
+            user.setNickname(request.getNickname());
+        }
+        if (org.springframework.util.StringUtils.hasText(request.getEmail())) {
+            user.setEmail(request.getEmail());
+        }
+        if (org.springframework.util.StringUtils.hasText(request.getPhone())) {
+            user.setPhone(request.getPhone());
+        }
+        if (org.springframework.util.StringUtils.hasText(request.getAvatar())) {
+            user.setAvatar(request.getAvatar());
+        }
+        updateById(user);
+        return UserVO.from(user);
     }
 }

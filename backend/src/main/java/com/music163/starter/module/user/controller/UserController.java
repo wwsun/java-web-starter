@@ -5,17 +5,24 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.music163.starter.common.exception.BusinessException;
 import com.music163.starter.common.result.Result;
 import com.music163.starter.common.result.ResultCode;
+import com.music163.starter.module.user.dto.ChangePasswordRequest;
+import com.music163.starter.module.user.dto.UpdateUserRequest;
 import com.music163.starter.module.user.entity.User;
 import com.music163.starter.module.user.service.UserService;
 import com.music163.starter.module.user.vo.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * 用户管理接口
+ * <p>
+ * /users/me 系列接口展示了"获取当前登录用户"的标准做法：
+ * 从 SecurityContextHolder 取用户名，不依赖请求参数。
  */
 @Tag(name = "用户管理", description = "用户的增删改查接口")
 @RestController
@@ -44,10 +51,49 @@ public class UserController {
         return Result.success(UserVO.from(user));
     }
 
+    @Operation(summary = "获取当前登录用户信息")
+    @GetMapping("/me")
+    public Result<UserVO> getCurrentUser() {
+        String username = currentUsername();
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+        return Result.success(UserVO.from(user));
+    }
+
+    @Operation(summary = "更新当前用户信息")
+    @PutMapping("/me")
+    public Result<UserVO> updateCurrentUser(@Valid @RequestBody UpdateUserRequest request) {
+        String username = currentUsername();
+        return Result.success(userService.updateUserInfo(username, request));
+    }
+
+    @Operation(summary = "修改当前用户密码")
+    @PutMapping("/me/password")
+    public Result<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        String username = currentUsername();
+        userService.changePassword(username, request);
+        return Result.success();
+    }
+
     @Operation(summary = "删除用户")
     @DeleteMapping("/{id}")
     public Result<Void> deleteUser(@PathVariable Long id) {
+        String username = currentUsername();
+        User currentUser = userService.findByUsername(username);
+        if (currentUser != null && currentUser.getId().equals(id)) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "不能删除当前登录用户");
+        }
         userService.removeById(id);
         return Result.success();
+    }
+
+    /**
+     * 从 Spring Security 上下文获取当前登录用户名
+     * （这是脚手架中获取当前用户的标准方式）
+     */
+    private String currentUsername() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }
