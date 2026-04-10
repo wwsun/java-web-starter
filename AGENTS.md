@@ -50,6 +50,24 @@
    - 时间字段使用 `created_at` / `updated_at`
 6. **通用编码规范**：参考 [Alibaba Java Coding Guidelines](doc/java-coding-guidelines.md)
 
+7. **DTO / VO 规范**：
+   - 请求入参使用 `XxxRequest`，放在 `module/<name>/dto/`，添加 `@NotNull`/`@Size` 等校验注解
+   - 响应出参使用 `XxxVO`，放在 `module/<name>/vo/`，不包含 `password`、`deleted` 等敏感字段
+   - Entity 不得直接作为 Controller 返回值
+   - VO 转换使用 `XxxVO.from(Entity)` 静态工厂方法，放在 VO 类中
+
+8. **获取当前登录用户（标准方式）**：
+   ```java
+   String username = SecurityContextHolder.getContext().getAuthentication().getName();
+   ```
+   不要在 Controller 方法参数中手动解析 `Authorization` Header。
+
+9. **测试规范**：
+   - Service 层业务逻辑必须有对应单元测试（`@ExtendWith(MockitoExtension.class)`，不依赖 Spring 容器）
+   - Controller 层使用 `@WebMvcTest` + `@Import(SecurityConfig.class)` 做切片测试
+   - 测试用 Token 统一通过 `TestJwtHelper` 生成，不在测试中硬编码 JWT 字符串
+   - 测试类命名：`<被测类名>Test.java`
+
 ### 前端
 
 1. **TypeScript 严格模式**：禁止使用 `any`
