@@ -9,8 +9,15 @@ backend/src/main/resources/static/*
 *.war
 *.ear
 
-# IDE
-.idea/
+# IDE - IntelliJ IDEA（排除个人配置，保留团队共享配置）
+.idea/shelf/
+.idea/httpRequests/
+.idea/queries/
+.idea/dataSources/
+.idea/*.xml
+!.idea/runConfigurations/
+!.idea/codeStyles/
+!.idea/inspectionProfiles/
 *.iml
 *.iws
 *.ipr
@@ -41,9 +48,6 @@ lerna-debug.log*
 
 # Logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
 # Coverage
 coverage/
