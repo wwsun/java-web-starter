@@ -1,6 +1,7 @@
 package com.music163.starter.module.user;
 
 import com.music163.starter.common.exception.BusinessException;
+import com.music163.starter.module.role.service.RoleService;
 import com.music163.starter.module.user.entity.User;
 import com.music163.starter.module.user.mapper.UserMapper;
 import com.music163.starter.module.user.service.impl.UserServiceImpl;
@@ -31,11 +32,14 @@ class UserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private RoleService roleService;
+
     private UserServiceImpl userService;
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(passwordEncoder);
+        userService = new UserServiceImpl(passwordEncoder, roleService);
         // 注入 baseMapper（ServiceImpl 的受保护字段）
         ReflectionTestUtils.setField(userService, "baseMapper", userMapper);
     }

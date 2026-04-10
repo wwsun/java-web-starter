@@ -5,6 +5,7 @@ import com.music163.starter.auth.controller.AuthController;
 import com.music163.starter.common.exception.BusinessException;
 import com.music163.starter.common.result.ResultCode;
 import com.music163.starter.module.user.mapper.UserMapper;
+import com.music163.starter.module.role.mapper.RoleMapper;
 import com.music163.starter.module.user.service.UserService;
 import com.music163.starter.security.CustomUserDetailsService;
 import com.music163.starter.security.JwtAuthenticationFilter;
@@ -53,6 +54,9 @@ class AuthControllerTest {
 
     @MockBean
     private UserMapper userMapper;
+
+    @MockBean
+    private RoleMapper roleMapper;
 
     @Test
     void login_success_shouldReturnAccessAndRefreshToken() throws Exception {

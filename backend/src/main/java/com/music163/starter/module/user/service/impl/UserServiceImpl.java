@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.music163.starter.common.exception.BusinessException;
 import com.music163.starter.common.result.ResultCode;
+import com.music163.starter.module.role.service.RoleService;
 import com.music163.starter.module.user.entity.User;
 import com.music163.starter.module.user.mapper.UserMapper;
 import com.music163.starter.module.user.service.UserService;
@@ -29,6 +30,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     // 注意：不重复注入 UserMapper，通过 ServiceImpl 的 baseMapper 访问
     private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
 
     @Override
     @Cacheable(value = "user", key = "#username", unless = "#result == null")
@@ -54,6 +56,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .status(1)
                 .build();
         save(user);
+        roleService.assignDefaultRole(user.getId());
         log.info("User registered: {}", request.getUsername());
     }
 

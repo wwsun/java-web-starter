@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.music163.starter.common.TestJwtHelper;
 import com.music163.starter.common.exception.BusinessException;
 import com.music163.starter.common.result.ResultCode;
+import com.music163.starter.module.role.service.RoleService;
 import com.music163.starter.module.user.controller.UserController;
 import com.music163.starter.module.user.dto.ChangePasswordRequest;
 import com.music163.starter.module.user.entity.User;
 import com.music163.starter.module.user.mapper.UserMapper;
+import com.music163.starter.module.role.mapper.RoleMapper;
 import com.music163.starter.module.user.service.UserService;
 import com.music163.starter.security.CustomUserDetailsService;
 import com.music163.starter.security.JwtAuthenticationFilter;
@@ -22,6 +24,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -44,6 +48,9 @@ class UserControllerTest {
     private UserService userService;
 
     @MockBean
+    private RoleService roleService;
+
+    @MockBean
     private JwtTokenProvider jwtTokenProvider;
 
     @MockBean
@@ -52,13 +59,20 @@ class UserControllerTest {
     @MockBean
     private UserMapper userMapper;
 
+    @MockBean
+    private RoleMapper roleMapper;
+
     private static final String TOKEN = TestJwtHelper.accessToken(TestJwtHelper.TEST_USERNAME);
     private static final String AUTH_HEADER = "Bearer " + TOKEN;
 
     @BeforeEach
     void setUpSecurityMocks() {
+        // 默认给测试用户赋予 ADMIN 角色（deleteUser 需要）
         UserDetails ud = org.springframework.security.core.userdetails.User
-                .withUsername(TestJwtHelper.TEST_USERNAME).password("pass").roles("USER").build();
+                .withUsername(TestJwtHelper.TEST_USERNAME)
+                .password("pass")
+                .roles("ADMIN", "USER")
+                .build();
         given(jwtTokenProvider.validateAccessToken(TOKEN)).willReturn(true);
         given(jwtTokenProvider.getUsernameFromToken(TOKEN)).willReturn(TestJwtHelper.TEST_USERNAME);
         given(userDetailsService.loadUserByUsername(TestJwtHelper.TEST_USERNAME)).willReturn(ud);
@@ -73,21 +87,37 @@ class UserControllerTest {
     }
 
     @Test
-    void getCurrentUser_whenAuthenticated_shouldReturnVOWithoutPassword() throws Exception {
+    void getCurrentUser_whenAuthenticated_shouldReturnVOWithRoles() throws Exception {
         User user = User.builder().id(1L).username(TestJwtHelper.TEST_USERNAME)
                 .nickname("Test").status(1).build();
         given(userService.findByUsername(TestJwtHelper.TEST_USERNAME)).willReturn(user);
+        given(roleService.getRoleCodesByUserId(1L)).willReturn(List.of("ADMIN"));
 
         mockMvc.perform(get("/users/me").header("Authorization", AUTH_HEADER))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.username").value(TestJwtHelper.TEST_USERNAME))
-                .andExpect(jsonPath("$.data.password").doesNotExist());
+                .andExpect(jsonPath("$.data.password").doesNotExist())
+                .andExpect(jsonPath("$.data.roles[0]").value("ADMIN"));
     }
 
     // ===== DELETE /users/{id} =====
 
     @Test
-    void deleteUser_whenDeletingSelf_shouldReturnError() throws Exception {
+    void deleteUser_whenNotAdmin_shouldReturn403() throws Exception {
+        UserDetails userOnly = org.springframework.security.core.userdetails.User
+                .withUsername(TestJwtHelper.TEST_USERNAME)
+                .password("pass")
+                .roles("USER")
+                .build();
+        given(userDetailsService.loadUserByUsername(TestJwtHelper.TEST_USERNAME))
+                .willReturn(userOnly);
+
+        mockMvc.perform(delete("/users/2").header("Authorization", AUTH_HEADER))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deleteUser_whenAdminDeletingSelf_shouldReturnError() throws Exception {
         User currentUser = User.builder().id(1L).username(TestJwtHelper.TEST_USERNAME).build();
         given(userService.findByUsername(TestJwtHelper.TEST_USERNAME)).willReturn(currentUser);
 

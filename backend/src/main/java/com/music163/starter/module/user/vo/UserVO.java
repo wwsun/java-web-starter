@@ -5,12 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 用户响应 VO
  * <p>
  * 对外暴露的用户信息，不含 password、deleted 等敏感/内部字段。
- * 使用 {@link #from(User)} 从实体转换，避免在 Controller/Service 中手动 set 字段。
+ * 使用 {@link #from(User)} 或 {@link #from(User, List)} 从实体转换。
  */
 @Data
 @Builder
@@ -26,9 +27,22 @@ public class UserVO {
     private LocalDateTime createdAt;
 
     /**
-     * 从 User 实体转换为 VO（标准转换入口）
+     * 用户角色列表（角色 code，如 ["ADMIN", "USER"]）
+     */
+    @Builder.Default
+    private List<String> roles = List.of();
+
+    /**
+     * 不含角色信息的转换（用于列表场景）
      */
     public static UserVO from(User user) {
+        return from(user, List.of());
+    }
+
+    /**
+     * 含角色信息的转换（用于当前用户详情场景）
+     */
+    public static UserVO from(User user, List<String> roles) {
         return UserVO.builder()
                 .id(user.getId())
                 .username(user.getUsername())
@@ -38,6 +52,7 @@ public class UserVO {
                 .avatar(user.getAvatar())
                 .status(user.getStatus())
                 .createdAt(user.getCreatedAt())
+                .roles(roles)
                 .build();
     }
 }

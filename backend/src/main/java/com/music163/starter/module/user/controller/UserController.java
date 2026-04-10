@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.music163.starter.common.exception.BusinessException;
 import com.music163.starter.common.result.Result;
 import com.music163.starter.common.result.ResultCode;
+import com.music163.starter.module.role.service.RoleService;
 import com.music163.starter.module.user.dto.ChangePasswordRequest;
 import com.music163.starter.module.user.dto.UpdateUserRequest;
 import com.music163.starter.module.user.entity.User;
@@ -15,14 +16,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 用户管理接口
- * <p>
- * /users/me 系列接口展示了"获取当前登录用户"的标准做法：
- * 从 SecurityContextHolder 取用户名，不依赖请求参数。
  */
 @Tag(name = "用户管理", description = "用户的增删改查接口")
 @RestController
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final RoleService roleService;
 
     @Operation(summary = "分页查询用户列表")
     @GetMapping
@@ -51,7 +53,7 @@ public class UserController {
         return Result.success(UserVO.from(user));
     }
 
-    @Operation(summary = "获取当前登录用户信息")
+    @Operation(summary = "获取当前登录用户信息（含角色）")
     @GetMapping("/me")
     public Result<UserVO> getCurrentUser() {
         String username = currentUsername();
@@ -59,7 +61,8 @@ public class UserController {
         if (user == null) {
             throw new BusinessException(ResultCode.USER_NOT_FOUND);
         }
-        return Result.success(UserVO.from(user));
+        List<String> roles = roleService.getRoleCodesByUserId(user.getId());
+        return Result.success(UserVO.from(user, roles));
     }
 
     @Operation(summary = "更新当前用户信息")
@@ -77,7 +80,8 @@ public class UserController {
         return Result.success();
     }
 
-    @Operation(summary = "删除用户")
+    @Operation(summary = "删除用户（仅管理员）")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public Result<Void> deleteUser(@PathVariable Long id) {
         String username = currentUsername();
@@ -89,10 +93,6 @@ public class UserController {
         return Result.success();
     }
 
-    /**
-     * 从 Spring Security 上下文获取当前登录用户名
-     * （这是脚手架中获取当前用户的标准方式）
-     */
     private String currentUsername() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
