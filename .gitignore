@@ -24,6 +24,9 @@ backend/src/main/resources/static/*
 .project
 .settings/
 
+# Claude-Code
+.claude/settings.local.json
+
 # ===============================
 # Node.js / Frontend
 # ===============================

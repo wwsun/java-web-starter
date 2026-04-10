@@ -1,14 +1,14 @@
 # Java Web Starter
 
-> 一套可复用的前后端分离 Web 工程基线，面向企业内部系统开发（如会议室预订），后续项目通过 fork / clone 快速启动。
+> 本项目是一套可复用的前后端分离 Web 工程脚手架，面向企业内部系统开发（如会议室预订），用于新项目通过 fork / clone 快速启动。
 
 ## 技术栈
 
-| 层级 | 技术 |
-|---|---|
-| **后端** | Spring Boot 3.2 · JDK 21 · MyBatis-Plus · Spring Security + JWT · Redis · Knife4j |
-| **前端** | Vite · React 19 · TypeScript · TailwindCSS v4 · React Router v6 · Axios · Zustand |
-| **基础设施** | Docker Compose · MySQL 8.4 · Redis 7 · Nginx |
+| 层级         | 技术                                                                              |
+| ------------ | --------------------------------------------------------------------------------- |
+| **后端**     | Spring Boot 3.2 · JDK 21 · MyBatis-Plus · Spring Security + JWT · Redis · Knife4j |
+| **前端**     | Vite · React 19 · TypeScript · TailwindCSS v4 · React Router v6 · Axios · Zustand |
+| **基础设施** | Docker Compose · MySQL 8.4 · Redis 7 · Nginx                                      |
 
 ## 快速启动
 
@@ -124,9 +124,9 @@ docker compose up -d
 
 ## 默认账号
 
-| 用户名 | 密码 | 角色 |
-|---|---|---|
-| admin | admin123 | 管理员 |
+| 用户名 | 密码     | 角色   |
+| ------ | -------- | ------ |
+| admin  | admin123 | 管理员 |
 
 ## 开发规范
 
