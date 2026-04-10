@@ -52,3 +52,10 @@ logging:
     root: INFO
     com.music163.starter: DEBUG
     org.springframework.security: DEBUG
+
+# ====================================
+# MyBatis-Plus（开发环境 SQL 日志）
+# ====================================
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
