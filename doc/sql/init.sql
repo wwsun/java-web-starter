@@ -36,3 +36,36 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- -------------------------------------------
 INSERT INTO `users` (`username`, `password`, `nickname`, `status`)
 VALUES ('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', '管理员', 1);
+
+-- -------------------------------------------
+-- RBAC: roles
+-- -------------------------------------------
+CREATE TABLE IF NOT EXISTS `roles` (
+    `id`   BIGINT      NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `code` VARCHAR(50) NOT NULL                COMMENT '角色编码，如 ADMIN / USER',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `uk_code` (`code`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '角色表';
+
+-- -------------------------------------------
+-- RBAC: user_roles
+-- -------------------------------------------
+CREATE TABLE IF NOT EXISTS `user_roles` (
+    `user_id` BIGINT NOT NULL COMMENT '用户ID',
+    `role_id` BIGINT NOT NULL COMMENT '角色ID',
+    PRIMARY KEY (`user_id`, `role_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户角色关联表';
+
+-- -------------------------------------------
+-- Seed: roles
+-- -------------------------------------------
+INSERT IGNORE INTO `roles` (`code`) VALUES ('ADMIN'), ('USER');
+
+-- -------------------------------------------
+-- Seed: admin user gets ADMIN role
+-- （依赖 users 表中 admin 的 id=1）
+-- -------------------------------------------
+INSERT IGNORE INTO `user_roles` (`user_id`, `role_id`)
+SELECT u.id, r.id
+FROM `users` u, `roles` r
+WHERE u.username = 'admin' AND r.code = 'ADMIN';
