@@ -2,6 +2,8 @@
 # Java / Maven
 # ===============================
 backend/target/
+backend/src/main/resources/static/*
+!backend/src/main/resources/static/.gitkeep
 *.class
 *.jar
 *.war
@@ -27,7 +29,11 @@ backend/target/
 # ===============================
 frontend/node_modules/
 frontend/dist/
+frontend/dist-ssr/
 frontend/.vite/
+frontend/*.local
+pnpm-debug.log*
+lerna-debug.log*
 
 # Logs
 *.log

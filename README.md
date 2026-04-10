@@ -12,56 +12,61 @@
 
 ## 快速启动
 
-### 方式一：Docker Compose（推荐）
+### 方式一：快速体验（单服务启动）
+
+前端构建产物内嵌到 Spring Boot 中，只需启动一个后端服务即可体验完整功能。
 
 ```bash
-# 克隆项目
-git clone <repo-url>
-cd java-web-starter
-
-# 一键启动基础设施（MySQL + Redis）
+# 1. 启动数据库和缓存
 docker compose up -d mysql redis
 
-# 等待服务就绪后启动后端
-docker compose up -d backend
+# 2. 构建前端并拷贝到后端静态资源目录
+cd frontend && npm install && npm run build
+cp -r dist/* ../backend/src/main/resources/static/
 
-# 启动前端
-docker compose up -d frontend nginx
+# 3. 启动后端
+cd ../backend && ./mvnw spring-boot:run
 
-# 访问
-# 前端: http://localhost
-# 后端 API: http://localhost/api
-# API 文档: http://localhost:8080/api/doc.html
+# 4. 访问 http://localhost:8080/api
+#    所有页面和 API 由同一个服务提供
 ```
 
-### 方式二：本地开发
+### 方式二：本地开发（前后端分离）
+
+日常开发推荐前后端分别启动，支持热更新。
 
 #### 前置条件
 
 - JDK 21（推荐使用 [SDKMAN](https://sdkman.io/) 管理）
 - Node.js 20+
 - Docker（用于 MySQL 和 Redis）
+- **IntelliJ IDEA**（推荐 Ultimate 版，内置前端开发支持）
 
 #### 启动步骤
 
 ```bash
 # 1. 启动数据库和缓存
 docker compose up -d mysql redis
+```
 
-# 2. 启动后端
-cd backend
-./mvnw spring-boot:run
+**后端**：
 
-# 3. 启动前端（新终端）
+1. 使用 IDEA 打开项目根目录 `java-web-starter/`
+2. 将 `backend/` 标记为 Maven 模块，等待依赖下载完成
+3. 运行 `StarterApplication.main()` 启动应用
+4. 访问 API 文档：http://localhost:8080/api/doc.html
+
+**前端**：
+
+1. 在 IDEA 内置终端中执行：
+
+```bash
 cd frontend
 npm install
 npm run dev
-
-# 4. 访问
-# 前端: http://localhost:5173
-# 后端 API: http://localhost:8080/api
-# API 文档: http://localhost:8080/api/doc.html
 ```
+
+2. 访问前端：http://localhost:5173（API 请求自动代理到后端）
 
 #### 启用 Mock 数据（可选）
 
@@ -70,6 +75,22 @@ npm run dev
 ```bash
 cd frontend
 VITE_ENABLE_MOCK=true npm run dev
+```
+
+### 方式三：Docker Compose（部署）
+
+```bash
+# 克隆项目
+git clone <repo-url>
+cd java-web-starter
+
+# 一键启动所有服务
+docker compose up -d
+
+# 访问
+# 前端: http://localhost
+# 后端 API: http://localhost/api
+# API 文档: http://localhost:8080/api/doc.html
 ```
 
 ## 项目结构
