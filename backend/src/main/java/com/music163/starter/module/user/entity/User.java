@@ -1,7 +1,7 @@
 package com.music163.starter.module.user.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
  * 用户实体
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName("users")
 public class User implements Serializable {
 
@@ -40,5 +43,6 @@ public class User implements Serializable {
     private LocalDateTime updatedAt;
 
     @TableLogic
-    private Integer deleted;
+    @Builder.Default
+    private Integer deleted = 0;
 }
