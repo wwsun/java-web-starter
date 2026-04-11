@@ -1,18 +1,18 @@
 package com.music163.starter.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.music163.starter.auth.controller.AuthController;
+import com.music163.starter.auth.AuthController;
 import com.music163.starter.common.exception.BusinessException;
 import com.music163.starter.common.result.ResultCode;
-import com.music163.starter.module.user.mapper.UserMapper;
-import com.music163.starter.module.role.mapper.RoleMapper;
-import com.music163.starter.module.user.service.UserService;
+import com.music163.starter.user.UserMapper;
+import com.music163.starter.role.RoleMapper;
+import com.music163.starter.user.UserService;
 import com.music163.starter.security.CustomUserDetailsService;
 import com.music163.starter.security.JwtAuthenticationFilter;
 import com.music163.starter.security.JwtTokenProvider;
 import com.music163.starter.security.SecurityConfig;
-import com.music163.starter.security.dto.LoginRequest;
-import com.music163.starter.security.dto.RegisterRequest;
+import com.music163.starter.auth.dto.LoginRequest;
+import com.music163.starter.auth.dto.RegisterRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

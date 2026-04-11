@@ -1,8 +1,8 @@
 package com.music163.starter.security;
 
-import com.music163.starter.module.role.mapper.RoleMapper;
-import com.music163.starter.module.user.entity.User;
-import com.music163.starter.module.user.mapper.UserMapper;
+import com.music163.starter.role.RoleMapper;
+import com.music163.starter.user.User;
+import com.music163.starter.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,12 +22,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserMapper userMapper;
+    private final UserService userService;
     private final RoleMapper roleMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userMapper.selectByUsername(username);
+        User user = userService.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("用户不存在: " + username);
         }
