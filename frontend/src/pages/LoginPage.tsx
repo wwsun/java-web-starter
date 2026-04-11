@@ -1,8 +1,15 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { User, Lock, AlertCircle } from 'lucide-react';
 import { login as loginApi } from '@/api/auth';
 import { getMe } from '@/api/user';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { PATHS } from '@/constants/paths';
+import { Logo } from '@/components/common/Logo';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -19,86 +26,111 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const res = await loginApi({ username, password });
-      setTokens(res.data.accessToken, res.data.refreshToken);
-      const meRes = await getMe();
-      setRoles(meRes.data.roles);
-      navigate('/', { replace: true });
+      const { accessToken, refreshToken } = await loginApi({ username, password });
+      setTokens(accessToken, refreshToken);
+
+      const { roles } = await getMe();
+      setRoles(roles);
+
+      navigate(PATHS.HOME, { replace: true });
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : '登录失败，请重试');
+      setError(err instanceof Error ? err.message : '登录失败');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900">
-      <div className="w-full max-w-md mx-4">
-        <div className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/20">
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-blue-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg shadow-blue-500/30">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <h1 className="text-2xl font-bold text-white">Web Starter</h1>
-            <p className="text-slate-400 mt-1">登录到管理后台</p>
-          </div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background vercel-grid px-4">
+      {/* Background Decorative Gradient */}
+      <div className="fixed inset-0 pointer-events-none opacity-40 dark:opacity-20 bg-[radial-gradient(circle_at_50%_50%,oklch(var(--foreground)/0.03)_0%,transparent_50%)]" />
 
-          {/* Error */}
-          {error && (
-            <div className="mb-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-300 text-sm">
-              {error}
-            </div>
-          )}
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-slate-300 mb-1.5">
-                用户名
-              </label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="请输入用户名"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1.5">
-                密码
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="请输入密码"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white font-medium rounded-xl shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
-            >
-              {loading ? '登录中...' : '登 录'}
-            </button>
-          </form>
-
-          <p className="text-center text-slate-500 text-sm mt-6">
-            默认账号: admin / admin123
+      <div className="w-full max-w-[400px] space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <Logo size="lg" className="mb-2" />
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            登录到 Web Starter
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            输入您的凭据以访问控制面板
           </p>
         </div>
+
+        <Card className="border-border bg-card shadow-sm rounded-lg overflow-hidden">
+          <CardHeader className="p-0 border-b border-border">
+            <div className="flex bg-muted/30 px-6 py-3 items-center justify-between">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-bold">
+                Authentication
+              </span>
+              <div className="flex gap-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-border" />
+                <div className="w-1.5 h-1.5 rounded-full bg-border" />
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent className="px-6 py-8">
+            {error && (
+              <div className="mb-6 p-3 rounded border border-destructive/20 bg-destructive/5 text-destructive text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4" />
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="username" className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                  Username
+                </Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+                  <Input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                    className="pl-10 h-10 bg-transparent border-border focus-visible:ring-1 focus-visible:ring-foreground"
+                    placeholder="Enter username"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="pl-10 h-10 bg-transparent border-border focus-visible:ring-1 focus-visible:ring-foreground"
+                    placeholder="Enter password"
+                  />
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full h-10 bg-foreground text-background hover:bg-foreground/90 transition-all font-medium rounded-md"
+              >
+                {loading ? 'Processing...' : 'Continue to Dashboard'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        <p className="text-center text-xs text-muted-foreground/60 font-mono italic">
+          Default Account: <span className="text-foreground">admin / admin123</span>
+        </p>
       </div>
     </div>
   );
 }
+
+

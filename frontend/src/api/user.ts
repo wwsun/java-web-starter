@@ -15,5 +15,6 @@ export interface UserVO {
  * 获取当前登录用户信息（含角色）
  */
 export function getMe() {
-  return client.get<unknown, { data: UserVO }>('/users/me');
+  return client.get<UserVO, UserVO>('/users/me');
 }
+

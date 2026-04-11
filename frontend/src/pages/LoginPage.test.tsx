@@ -31,18 +31,18 @@ describe('LoginPage', () => {
   it('渲染用户名、密码输入框和登录按钮', () => {
     renderLoginPage()
 
-    expect(screen.getByLabelText('用户名')).toBeInTheDocument()
-    expect(screen.getByLabelText('密码')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '登 录' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Username')).toBeInTheDocument()
+    expect(screen.getByLabelText('Password')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue to Dashboard' })).toBeInTheDocument()
   })
 
   it('登录成功：跳转到首页', async () => {
     const user = userEvent.setup()
     renderLoginPage()
 
-    await user.type(screen.getByLabelText('用户名'), 'admin')
-    await user.type(screen.getByLabelText('密码'), 'admin123')
-    await user.click(screen.getByRole('button', { name: '登 录' }))
+    await user.type(screen.getByLabelText('Username'), 'admin')
+    await user.type(screen.getByLabelText('Password'), 'admin123')
+    await user.click(screen.getByRole('button', { name: 'Continue to Dashboard' }))
 
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true })
@@ -55,9 +55,9 @@ describe('LoginPage', () => {
     const user = userEvent.setup()
     renderLoginPage()
 
-    await user.type(screen.getByLabelText('用户名'), 'wronguser')
-    await user.type(screen.getByLabelText('密码'), 'wrongpass')
-    await user.click(screen.getByRole('button', { name: '登 录' }))
+    await user.type(screen.getByLabelText('Username'), 'wronguser')
+    await user.type(screen.getByLabelText('Password'), 'wrongpass')
+    await user.click(screen.getByRole('button', { name: 'Continue to Dashboard' }))
 
     await waitFor(() => {
       expect(screen.getByText('用户名或密码错误')).toBeInTheDocument()

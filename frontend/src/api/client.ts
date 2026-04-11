@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 /**
  * Axios 实例
  * - 请求拦截器：自动注入 Access Token
- * - 响应拦截器：401 时先尝试用 Refresh Token 续期，续期失败才跳转登录
+ * - 响应拦截器：精简返回结构，401 时自动换牌
  */
 const client: AxiosInstance = axios.create({
   baseURL: '/api',
@@ -27,7 +27,8 @@ let pendingRequests: Array<(token: string) => void> = [];
 // ==================== 请求拦截器 ====================
 client.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('access_token');
+    // 从 Zustand Store 中获取 token (Store 内部处理了持久化)
+    const token = useAuthStore.getState().token;
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -40,20 +41,22 @@ client.interceptors.request.use(
 client.interceptors.response.use(
   (response: AxiosResponse) => {
     const { data } = response;
+    // 如果 code 不存在或者不是 200，则判定为错误
     if (data.code !== undefined && data.code !== 200) {
       console.error(`[API Error] ${data.code}: ${data.message}`);
       return Promise.reject(new Error(data.message || '请求失败'));
     }
-    return data;
+    // 直接返回业务 Payload (data.data)
+    return data.data !== undefined ? data.data : data;
   },
   async (error) => {
     if (error.response?.status !== 401) {
       return Promise.reject(error);
     }
 
-    const rt = localStorage.getItem('refresh_token');
+    const { refreshToken: rt, logout, setTokens } = useAuthStore.getState();
     if (!rt) {
-      useAuthStore.getState().logout();
+      logout();
       window.location.href = '/login';
       return Promise.reject(error);
     }
@@ -62,7 +65,9 @@ client.interceptors.response.use(
     if (isRefreshing) {
       return new Promise<unknown>((resolve) => {
         pendingRequests.push((newToken: string) => {
-          error.config.headers.Authorization = `Bearer ${newToken}`;
+          if (error.config.headers) {
+            error.config.headers.Authorization = `Bearer ${newToken}`;
+          }
           resolve(client(error.config));
         });
       });
@@ -75,17 +80,19 @@ client.interceptors.response.use(
         headers: { Authorization: `Bearer ${rt}` },
       });
       const { accessToken, refreshToken: newRefreshToken } = res.data.data;
-      useAuthStore.getState().setTokens(accessToken, newRefreshToken);
+      setTokens(accessToken, newRefreshToken);
 
       // 重试等待队列中的请求
       pendingRequests.forEach((cb) => cb(accessToken));
       pendingRequests = [];
 
       // 重试原请求
-      error.config.headers.Authorization = `Bearer ${accessToken}`;
+      if (error.config.headers) {
+        error.config.headers.Authorization = `Bearer ${accessToken}`;
+      }
       return client(error.config);
     } catch {
-      useAuthStore.getState().logout();
+      logout();
       window.location.href = '/login';
       return Promise.reject(error);
     } finally {
@@ -95,3 +102,4 @@ client.interceptors.response.use(
 );
 
 export default client;
+

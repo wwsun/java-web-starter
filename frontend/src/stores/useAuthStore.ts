@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface AuthState {
   token: string | null;
@@ -12,27 +13,40 @@ interface AuthState {
 
 /**
  * 认证状态管理 (Zustand)
- * Token 持久化到 localStorage
+ * 使用 persist 中间件自动同步到 localStorage
  */
-export const useAuthStore = create<AuthState>((set) => ({
-  token: localStorage.getItem('access_token'),
-  refreshToken: localStorage.getItem('refresh_token'),
-  isAuthenticated: !!localStorage.getItem('access_token'),
-  roles: [],
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      token: null,
+      refreshToken: null,
+      isAuthenticated: false,
+      roles: [],
 
-  setTokens: (accessToken: string, refreshToken: string) => {
-    localStorage.setItem('access_token', accessToken);
-    localStorage.setItem('refresh_token', refreshToken);
-    set({ token: accessToken, refreshToken, isAuthenticated: true });
-  },
+      setTokens: (accessToken, refreshToken) => {
+        set({
+          token: accessToken,
+          refreshToken,
+          isAuthenticated: true,
+        });
+      },
 
-  setRoles: (roles: string[]) => {
-    set({ roles });
-  },
+      setRoles: (roles) => {
+        set({ roles });
+      },
 
-  logout: () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    set({ token: null, refreshToken: null, isAuthenticated: false, roles: [] });
-  },
-}));
+      logout: () => {
+        set({
+          token: null,
+          refreshToken: null,
+          isAuthenticated: false,
+          roles: [],
+        });
+      },
+    }),
+    {
+      name: 'auth-storage', // localStorage 中的 key
+    }
+  )
+);
+

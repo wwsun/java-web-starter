@@ -23,19 +23,20 @@ export interface TokenResponse {
  * 用户登录
  */
 export function login(params: LoginParams) {
-  return client.post<unknown, { data: TokenResponse }>('/auth/login', params);
+  return client.post<TokenResponse, TokenResponse>('/auth/login', params);
 }
 
 /**
  * 用户注册
  */
 export function register(params: RegisterParams) {
-  return client.post('/auth/register', params);
+  return client.post<void, void>('/auth/register', params);
 }
 
 /**
  * 刷新 Token
  */
 export function refreshToken() {
-  return client.post<unknown, { data: TokenResponse }>('/auth/refresh');
+  return client.post<TokenResponse, TokenResponse>('/auth/refresh');
 }
+

@@ -1,33 +1,10 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
 import LoginPage from '@/pages/LoginPage';
 import DashboardPage from '@/pages/DashboardPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import ForbiddenPage from '@/pages/ForbiddenPage';
-import { useAuthStore } from '@/stores/useAuthStore';
-import type { ReactNode } from 'react';
-
-/**
- * 路由守卫：未登录重定向到登录页；无角色权限重定向到 403 页
- */
-function RequireAuth({
-  children,
-  requiredRole,
-}: {
-  children: ReactNode;
-  requiredRole?: string;
-}) {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const roles = useAuthStore((s) => s.roles);
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-  if (requiredRole && !roles.includes(requiredRole)) {
-    return <Navigate to="/403" replace />;
-  }
-  return <>{children}</>;
-}
+import RequireAuth from '@/router/RequireAuth';
 
 export const router = createBrowserRouter([
   {
