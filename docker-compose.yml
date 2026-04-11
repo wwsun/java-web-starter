@@ -31,6 +31,8 @@ services:
     image: redis:7-alpine
     container_name: starter-redis
     restart: unless-stopped
+    profiles:
+      - cache
     ports:
       - "6379:6379"
     # 若 REDIS_PASSWORD 非空则启用密码保护，否则无密码模式（本地开发默认）
@@ -39,7 +41,7 @@ services:
              && redis-server --requirepass $$REDIS_PASSWORD
              || redis-server"
     environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD:}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
     volumes:
       - redis-data:/data
     healthcheck:
@@ -82,14 +84,13 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/starter_db?useUnicode=true&characterEncoding=utf8mb4&serverTimezone=Asia/Shanghai
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123456}
+      SPRING_CACHE_TYPE: ${SPRING_CACHE_TYPE:-simple}
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
-      SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD:}
+      SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       JWT_SECRET: ${JWT_SECRET:-your-256-bit-secret-key-change-in-production}
     depends_on:
       mysql:
-        condition: service_healthy
-      redis:
         condition: service_healthy
 
   # ----------------------------------------

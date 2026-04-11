@@ -6,7 +6,7 @@
 - **框架**: Spring Boot 3.2.x
 - **ORM**: MyBatis-Plus 3.5.x（禁止使用 JPA/Hibernate）
 - **数据库**: MySQL 8.4
-- **缓存**: Redis 7 + Spring Cache
+- **缓存**: Spring Cache（默认 simple，可选 Redis 7）
 - **认证**: Spring Security + JWT（JJWT 库）
 - **API 文档**: Knife4j（SpringDoc OpenAPI）
 - **构建工具**: Maven

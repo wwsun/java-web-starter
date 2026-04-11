@@ -15,7 +15,7 @@
 - **SDKMAN**（管理 Java 和 Maven 版本）
 - **Java 21**：`sdk install java 21.0.10-tem`
 - **Maven 3.9.9**：`sdk install maven 3.9.9`
-- **Docker**（用于启动 MySQL 和 Redis）：`docker compose up -d mysql redis`
+- **Docker**（用于启动 MySQL，Redis 缓存按需启用）：`docker compose up -d mysql`
 
 ---
 

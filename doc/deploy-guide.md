@@ -22,8 +22,11 @@ JWT_SECRET=your-256-bit-secret-key-change-in-production
 ### 部署步骤
 
 ```bash
-# 1. 构建并启动所有服务
+# 1. 构建并启动默认服务（不含 Redis）
 docker compose up -d --build
+
+# 如需启用 Redis 缓存
+# SPRING_CACHE_TYPE=redis docker compose --profile cache up -d --build
 
 # 2. 查看服务状态
 docker compose ps
@@ -42,22 +45,23 @@ docker compose down -v
 ### 服务端口
 
 | 服务 | 端口 | 说明 |
-|---|---|---|
+| --- | --- | --- |
 | Nginx | 80 | 反向代理入口 |
 | Backend | 8080 | Spring Boot API |
 | MySQL | 3306 | 数据库 |
-| Redis | 6379 | 缓存 |
+| Redis | 6379 | 可选缓存服务 |
 
 ## 环境变量说明
 
 ### 后端环境变量
 
 | 变量 | 说明 | 默认值 |
-|---|---|---|
+| --- | --- | --- |
 | `SPRING_PROFILES_ACTIVE` | 激活的配置文件 | `dev` |
 | `SPRING_DATASOURCE_URL` | 数据库 JDBC URL | - |
 | `SPRING_DATASOURCE_USERNAME` | 数据库用户名 | - |
 | `SPRING_DATASOURCE_PASSWORD` | 数据库密码 | - |
+| `SPRING_CACHE_TYPE` | 缓存实现类型 | `simple` |
 | `SPRING_DATA_REDIS_HOST` | Redis 主机 | `localhost` |
 | `SPRING_DATA_REDIS_PORT` | Redis 端口 | `6379` |
 | `JWT_SECRET` | JWT 签名密钥（≥256位） | - |
@@ -65,7 +69,7 @@ docker compose down -v
 ### 前端环境变量
 
 | 变量 | 说明 | 默认值 |
-|---|---|---|
+| --- | --- | --- |
 | `VITE_ENABLE_MOCK` | 启用 MSW Mock | `false` |
 
 ## CI/CD 接入指引

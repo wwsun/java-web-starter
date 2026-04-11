@@ -15,7 +15,7 @@ spring:
       max-lifetime: 1800000
       connection-timeout: 30000
 
-  # Redis (from environment variables)
+  # Redis（仅在 spring.cache.type=redis 时使用）
   data:
     redis:
       host: ${SPRING_DATA_REDIS_HOST}
@@ -31,7 +31,7 @@ spring:
 
   # Cache
   cache:
-    type: redis
+    type: ${SPRING_CACHE_TYPE:simple}
     redis:
       time-to-live: 3600000
       key-prefix: "starter:"

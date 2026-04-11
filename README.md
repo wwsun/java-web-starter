@@ -4,11 +4,11 @@
 
 ## 技术栈
 
-| 层级         | 技术                                                                              |
-| ------------ | --------------------------------------------------------------------------------- |
-| **后端**     | Spring Boot 3.2 · JDK 21 · MyBatis-Plus · Spring Security + JWT · Redis · Knife4j |
-| **前端**     | Vite · React 19 · TypeScript · TailwindCSS v4 · React Router v6 · Axios · Zustand |
-| **基础设施** | Docker Compose · MySQL 8.4 · Redis 7 · Nginx                                      |
+| 层级 | 技术 |
+| --- | --- |
+| **后端** | Spring Boot 3.2 · JDK 21 · MyBatis-Plus · Spring Security + JWT · Spring Cache（可选 Redis） · Knife4j |
+| **前端** | Vite · React 19 · TypeScript · TailwindCSS v4 · React Router v6 · Axios · Zustand |
+| **基础设施** | Docker Compose · MySQL 8.4 · Redis 7 · Nginx |
 
 ## 快速启动
 
@@ -17,8 +17,8 @@
 前端构建产物内嵌到 Spring Boot 中，只需启动一个后端服务即可体验完整功能。
 
 ```bash
-# 1. 启动数据库和缓存
-docker compose up -d mysql redis
+# 1. 启动数据库
+docker compose up -d mysql
 
 # 2. 构建前端并拷贝到后端静态资源目录
 cd frontend && npm install && npm run build
@@ -26,6 +26,10 @@ cp -r dist/* ../backend/src/main/resources/static/
 
 # 3. 启动后端
 cd ../backend && mvn spring-boot:run
+
+# 如需启用 Redis 缓存，再额外启动 Redis 并设置
+# docker compose --profile cache up -d redis
+# SPRING_CACHE_TYPE=redis mvn spring-boot:run
 
 # 4. 访问 http://localhost:8080/api
 #    所有页面和 API 由同一个服务提供
@@ -39,14 +43,14 @@ cd ../backend && mvn spring-boot:run
 
 - JDK 21（推荐使用 [SDKMAN](https://sdkman.io/) 管理）
 - Node.js 20+
-- Docker（用于 MySQL 和 Redis）
+- Docker（用于 MySQL，Redis 缓存按需启用）
 - **IntelliJ IDEA**（推荐 Ultimate 版，内置前端开发支持）
 
 #### 启动步骤
 
 ```bash
-# 1. 启动数据库和缓存
-docker compose up -d mysql redis
+# 1. 启动数据库
+docker compose up -d mysql
 ```
 
 **后端**：
@@ -54,7 +58,7 @@ docker compose up -d mysql redis
 1. 使用 IDEA 打开项目根目录 `java-web-starter/`
 2. 将 `backend/` 标记为 Maven 模块，等待依赖下载完成
 3. 运行 `StarterApplication.main()` 启动应用
-4. 访问 API 文档：http://localhost:8080/api/doc.html
+4. 访问 API 文档：<http://localhost:8080/api/doc.html>
 
 **前端**：
 
@@ -66,7 +70,7 @@ npm install
 npm run dev
 ```
 
-2. 访问前端：http://localhost:5173（API 请求自动代理到后端）
+1. 访问前端：<http://localhost:5173>（API 请求自动代理到后端）
 
 #### 启用 Mock 数据（可选）
 
@@ -84,8 +88,12 @@ VITE_ENABLE_MOCK=true npm run dev
 git clone <repo-url>
 cd java-web-starter
 
-# 一键启动所有服务
+# 默认启动 MySQL、后端、前端、Nginx
 docker compose up -d
+
+# 如需启用 Redis 缓存
+# SPRING_CACHE_TYPE=redis docker compose --profile cache up -d
+# 或者只补启 Redis：docker compose --profile cache up -d redis
 
 # 访问
 # 前端: http://localhost

@@ -16,7 +16,7 @@ spring:
       max-lifetime: 1800000
       connection-timeout: 30000
 
-  # Redis
+  # Redis（仅在 spring.cache.type=redis 时使用）
   data:
     redis:
       host: localhost
@@ -33,11 +33,9 @@ spring:
 
   # Cache
   cache:
-    type: redis
-    redis:
-      time-to-live: 3600000
-      key-prefix: "starter:"
-      use-key-prefix: true
+    type: simple
+
+# 如需启用 Redis 缓存，可通过环境变量覆盖：SPRING_CACHE_TYPE=redis
 
 # ====================================
 # JWT Configuration
