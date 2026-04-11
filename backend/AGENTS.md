@@ -51,7 +51,7 @@ String username = SecurityContextHolder.getContext().getAuthentication().getName
 ## 测试规范
 
 - Service 层业务逻辑必须有对应单元测试（`@ExtendWith(MockitoExtension.class)`，不依赖 Spring 容器）
-- Controller 层使用 `@WebMvcTest` + `@Import(SecurityConfig.class)` 做切片测试
+- Controller 层使用 `@WebMvcTest` + `@Import({SecurityConfig.class, SecurityBeanConfig.class})` 做切片测试
 - 测试用 Token 统一通过 `TestJwtHelper` 生成，不在测试中硬编码 JWT 字符串
 - 测试类命名：`<被测类名>Test.java`
 
@@ -81,7 +81,7 @@ com.music163.starter
 ├── security          → Spring Security 核心配置
 ├── common.result     → Result<T>, ResultCode
 ├── common.exception  → BusinessException, GlobalExceptionHandler
-└── common.config     → MyBatisPlusConfig, RedisConfig, Knife4jConfig
+└── common.config     → MyBatisPlusConfig, RedisConfig, Knife4jConfig, SecurityBeanConfig
 ```
 
 ## 关键文件

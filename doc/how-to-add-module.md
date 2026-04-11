@@ -196,7 +196,7 @@ class MeetingRoomServiceTest {
 package com.music163.starter.meetingroom;
 
 @WebMvcTest(controllers = MeetingRoomController.class)
-@Import({SecurityConfig.class, JwtAuthenticationFilter.class})
+@Import({SecurityConfig.class, SecurityBeanConfig.class, JwtAuthenticationFilter.class})
 class MeetingRoomControllerTest {
     // 参考 UserControllerTest 模式
 }

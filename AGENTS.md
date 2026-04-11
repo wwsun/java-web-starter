@@ -28,8 +28,11 @@ nginx/       → Nginx 反向代理配置
 ## 基础设施命令
 
 ```bash
-# 启动数据库和缓存（开发必须）
-docker compose up -d mysql redis
+# 启动基础设施（MySQL 必须；Redis 可选）
+docker compose up -d mysql
+
+# 若需启用 Redis 缓存支持
+docker compose up -d redis
 
 # 启动所有服务（生产部署）
 docker compose up -d
