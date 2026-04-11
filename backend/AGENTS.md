@@ -23,6 +23,7 @@
 3. **Service 层**：
    - 接口 + 实现类模式（`UserService` + `UserServiceImpl`）
    - 继承 `IService<Entity>`
+   - 实现类与接口放在同级，不套 `impl/` 子包
 4. **异常处理**：
    - 业务异常抛 `BusinessException`
    - 禁止在 Controller 层 try-catch
@@ -34,9 +35,9 @@
 
 ## DTO / VO 规范
 
-- 请求入参使用 `XxxRequest`，放在 `module/<name>/dto/`，添加 `@NotNull`/`@Size` 等校验注解
-- 响应出参使用 `XxxVO`，放在 `module/<name>/vo/`，不包含 `password`、`deleted` 等敏感字段
-- Entity 不得直接作为 Controller 返回值
+- 请求入参使用 `XxxRequest`，放在 `<name>/dto/`，添加 `@NotNull`/`@Size` 等校验注解
+- 响应出参使用 `XxxVO`，放在 `<name>/`，不包含 `password`、`deleted` 等敏感字段
+- Entity 不得直接作为 Controller 返回值，也直接放在 `<name>/`
 - VO 转换使用 `XxxVO.from(Entity)` 静态工厂方法，放在 VO 类中
 
 ## 获取当前登录用户
@@ -56,27 +57,31 @@ String username = SecurityContextHolder.getContext().getAuthentication().getName
 
 ## 新增业务模块模板
 
-在 `src/main/java/com/music163/starter/module/` 下创建：
+业务模块直接位于 `com.music163.starter` 下（不套 `module/` 中间层）：
 
 ```
-module/<name>/
-├── controller/<Name>Controller.java
-├── service/<Name>Service.java
-├── service/impl/<Name>ServiceImpl.java
-├── mapper/<Name>Mapper.java
-└── entity/<Name>.java
+<name>/
+├── <Name>Controller.java
+├── <Name>Service.java
+├── <Name>ServiceImpl.java   # 与接口同级
+├── <Name>Mapper.java
+├── <Name>.java             # Entity
+├── <Name>VO.java           # 响应出参
+└── dto/
+    └── <Name>Request.java  # 请求入参
 ```
 
 ## 包结构
 
 ```
 com.music163.starter
+├── auth              → 认证模块 (AuthController, dto/)
+├── user              → 用户模块
+├── role              → 角色模块
+├── security          → Spring Security 核心配置
 ├── common.result     → Result<T>, ResultCode
 ├── common.exception  → BusinessException, GlobalExceptionHandler
-├── common.config     → MyBatisPlusConfig, RedisConfig, Knife4jConfig
-├── security          → SecurityConfig, JWT 认证
-├── auth.controller   → AuthController (登录/注册/刷新)
-└── module.user       → 用户模块 (entity/mapper/service/controller)
+└── common.config     → MyBatisPlusConfig, RedisConfig, Knife4jConfig
 ```
 
 ## 关键文件
@@ -95,9 +100,6 @@ mvn spring-boot:run
 
 # 运行全部测试
 mvn test
-
-# 运行单个测试类
-mvn test -Dtest=UserServiceTest
 ```
 
 ## 关键约定

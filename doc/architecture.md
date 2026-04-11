@@ -67,9 +67,9 @@ Token 刷新 POST /auth/refresh（携带 refresh_token）
 
 | 类型 | 用途 | 位置 |
 |------|------|------|
-| `XxxRequest` | 请求入参（@Valid 校验） | `module/<name>/dto/` |
-| `XxxVO` | 响应出参（安全字段子集） | `module/<name>/vo/` |
-| `Entity` | 数据库映射 | `module/<name>/entity/` |
+| `XxxRequest` | 请求入参（@Valid 校验） | `<name>/dto/` |
+| `XxxVO` | 响应出参（安全字段子集） | `<name>/` |
+| `Entity` | 数据库映射 | `<name>/` |
 
 转换入口：`XxxVO.from(Entity)` 静态方法（见 `UserVO.java`）
 
@@ -98,7 +98,7 @@ Token 刷新 POST /auth/refresh（携带 refresh_token）
 ## 新增业务模块 Checklist
 
 ```
-1. [ ] 在 module/<name>/ 下创建 entity/dto/vo/mapper/service/controller
+1. [ ] 在 com.music163.starter.<name>/ 下创建模块（直接放根包，不套 module/）
 2. [ ] Entity 添加 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 3. [ ] 请求入参定义为 XxxRequest，添加 @NotNull/@Size 等校验注解
 4. [ ] 响应出参定义为 XxxVO，实现 XxxVO.from(Entity) 静态方法
