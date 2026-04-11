@@ -25,7 +25,7 @@ cd frontend && npm install && npm run build
 cp -r dist/* ../backend/src/main/resources/static/
 
 # 3. 启动后端
-cd ../backend && ./mvnw spring-boot:run
+cd ../backend && mvn spring-boot:run
 
 # 4. 访问 http://localhost:8080/api
 #    所有页面和 API 由同一个服务提供

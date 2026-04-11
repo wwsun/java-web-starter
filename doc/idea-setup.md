@@ -89,8 +89,7 @@
 | User settings file | 默认（`~/.m2/settings.xml`） |
 | Local repository | 默认（`~/.m2/repository`） |
 
-> 若 IDEA 已自动识别 Maven Wrapper（`./mvnw`），此步骤可跳过。  
-> 判断方式：Maven 面板中能正常看到项目的 Lifecycle 和 Dependencies。
+> 项目通过 `.sdkmanrc` 管理 Java 和 Maven 版本（`maven=3.9.9`），IDEA 的 Maven home path 应指向 `~/.sdkman/candidates/maven/current`。
 
 ---
 

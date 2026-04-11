@@ -4,6 +4,36 @@
 
 ---
 
+## 后端包结构约定
+
+所有业务模块直接放在根包 `com.music163.starter` 下，**不套 `module/` 中间层**：
+
+```
+com.music163.starter
+├── auth/                  # 认证模块（Controller + Service + dto/）
+├── user/                  # 用户模块
+├── role/                  # 角色模块
+├── meeting-room/          # 会议室模块（示例）
+├── security/              # Spring Security 框架配置（仅框架类）
+└── common/                # 通用工具、异常、返回值
+```
+
+**模块内部结构规范：**
+
+| 文件 | 位置 | 说明 |
+|---|---|---|
+| `XxxController.java` | 模块根包 | REST 入口，只做路由和参数校验 |
+| `XxxService.java` | 模块根包 | Service 接口 |
+| `XxxServiceImpl.java` | 模块根包 | Service 实现与接口**同级**，不套 `impl/` 子包 |
+| `XxxMapper.java` | 模块根包 | MyBatis-Plus Mapper |
+| `Xxx.java` (Entity) | 模块根包 | 数据库实体 |
+| `XxxVO.java` | 模块根包 | 响应出参 |
+| `dto/XxxRequest.java` | `dto/` 子包 | 请求入参（仅有多个 DTO 时才建 `dto/` 子包） |
+
+> `service/impl/` 子包仅在同一接口有多个实现时才创建，日常单实现无需此层。
+
+---
+
 ## Step 1：写 Spec
 
 复制 `doc/templates/module-spec-template.md`，保存为 `doc/specs/meeting-room-spec.md`，填写：
@@ -38,22 +68,29 @@ CREATE TABLE IF NOT EXISTS `meeting_rooms` (
 
 ## Step 3：后端开发
 
-在 `backend/src/main/java/com/music163/starter/module/` 下创建：
+在 `backend/src/main/java/com/music163/starter/` 下直接创建业务包（不套 `module/` 中间层）：
 
 ```
 meeting-room/
-├── entity/MeetingRoom.java          # @TableName("meeting_rooms")，加 Lombok
-├── mapper/MeetingRoomMapper.java    # extends BaseMapper<MeetingRoom>
-├── service/MeetingRoomService.java  # extends IService<MeetingRoom>
-├── service/impl/MeetingRoomServiceImpl.java
-├── dto/CreateMeetingRoomRequest.java  # 请求入参，@NotBlank/@Size 校验
-├── vo/MeetingRoomVO.java            # 响应出参，含 from(entity) 静态方法
-└── controller/MeetingRoomController.java
+├── MeetingRoom.java                 # Entity，@TableName("meeting_rooms")，加 Lombok
+├── MeetingRoomMapper.java           # extends BaseMapper<MeetingRoom>
+├── MeetingRoomService.java          # extends IService<MeetingRoom>
+├── MeetingRoomServiceImpl.java      # Service 实现与接口同级，不套 impl/ 子包
+├── MeetingRoomController.java
+├── MeetingRoomVO.java               # 响应出参，含 from(entity) 静态方法
+└── dto/
+    └── CreateMeetingRoomRequest.java  # 请求入参，@NotBlank/@Size 校验
 ```
 
-`Controller` 示例：
+> **包命名约定**
+> - Entity / Mapper / Service / Controller 直接放在模块根包，只有存在多个 DTO 时才建 `dto/` 子包
+> - `service/impl/` 子包仅在一个接口有多个实现时才创建，通常不需要
+
+`MeetingRoomController.java` 示例：
 
 ```java
+package com.music163.starter.meetingroom;
+
 @Tag(name = "会议室管理")
 @RestController
 @RequestMapping("/meeting-rooms")
@@ -131,6 +168,8 @@ public class MeetingRoomController {
 **后端 Service 单元测试**（`MeetingRoomServiceTest.java`）：
 
 ```java
+package com.music163.starter.meetingroom;
+
 @ExtendWith(MockitoExtension.class)
 class MeetingRoomServiceTest {
 
@@ -149,9 +188,13 @@ class MeetingRoomServiceTest {
 }
 ```
 
+> 测试类包名与被测类保持一致（均在 `com.music163.starter.meetingroom`）。
+
 **后端 Controller 切片测试**（`MeetingRoomControllerTest.java`）：
 
 ```java
+package com.music163.starter.meetingroom;
+
 @WebMvcTest(controllers = MeetingRoomController.class)
 @Import({SecurityConfig.class, JwtAuthenticationFilter.class})
 class MeetingRoomControllerTest {
@@ -165,7 +208,7 @@ class MeetingRoomControllerTest {
 
 ## Step 7：提交前自测 Checklist
 
-- [ ] `cd backend && ./mvnw test` — 全绿
+- [ ] `cd backend && mvn test` — 全绿
 - [ ] `cd frontend && npm run test:run` — 全绿
 - [ ] 启动服务，访问 `/api/doc.html`，新接口有 `@Tag` 和 `@Operation` 描述
 - [ ] VO 不含 `password`、`deleted` 字段
