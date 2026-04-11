@@ -1,9 +1,14 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Users, LogOut, Search, Command, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { Logo } from '@/components/common/Logo';
+import { Button } from '@/components/ui/button';
+import { PATHS } from '@/constants/paths';
+import { cn } from '@/lib/utils';
 
 const navItems = [
-  { path: '/', label: '仪表盘', icon: '📊' },
-  { path: '/users', label: '用户管理', icon: '👥' },
+  { path: PATHS.DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
+  { path: PATHS.USERS, label: 'User Management', icon: Users },
 ];
 
 export default function MainLayout() {
@@ -12,74 +17,102 @@ export default function MainLayout() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login', { replace: true });
+    navigate(PATHS.LOGIN, { replace: true });
   };
 
   return (
-    <div className="flex h-screen bg-slate-50">
-      {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0">
-        {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-slate-800">
-          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+    <div className="flex h-screen bg-background font-sans overflow-hidden">
+      {/* Sidebar - Border-only design */}
+      <aside className="w-[240px] border-r border-border bg-background flex flex-col shrink-0">
+        <div className="h-14 flex items-center px-6 gap-3">
+          <Logo size="sm" />
+          <span className="font-bold text-foreground text-sm tracking-tight font-heading">
+            WebStarter
+          </span>
+          <div className="ml-auto flex items-center gap-1 border border-border rounded px-1.5 py-0.5 bg-muted/50">
+            <span className="text-[10px] text-muted-foreground font-mono font-bold tracking-tighter">PRO</span>
           </div>
-          <span className="font-bold text-white text-lg">WebStarter</span>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 py-4 px-3 space-y-1">
+        <nav className="flex-1 py-6 px-3 space-y-1">
+          <div className="px-3 mb-2">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground/50">
+              Overview
+            </span>
+          </div>
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
-              end={item.path === '/'}
+              end={item.path === PATHS.HOME}
               className={({ isActive }) =>
-                `flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                cn(
+                  "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all group",
                   isActive
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                }`
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                )
               }
             >
-              <span className="mr-3 text-lg">{item.icon}</span>
+              <item.icon className="mr-3 w-4 h-4 shrink-0" />
               {item.label}
+              {item.path === PATHS.DASHBOARD && (
+                <span className="ml-auto text-[10px] opacity-50 group-hover:opacity-100 transition-opacity">
+                  ⌘1
+                </span>
+              )}
             </NavLink>
           ))}
         </nav>
 
-        {/* User & Logout */}
-        <div className="p-4 border-t border-slate-800">
-          <button
+        {/* Bottom Sidebar */}
+        <div className="p-3 border-t border-border mt-auto">
+          <Button
+            variant="ghost"
             onClick={handleLogout}
-            data-testid="logout-btn"
-            className="w-full flex items-center px-4 py-3 text-sm text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all cursor-pointer"
+            className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/5 px-3 py-2 h-9 rounded-md transition-all group"
           >
-            <span className="mr-3">🚪</span>
-            退出登录
-          </button>
+            <LogOut className="mr-3 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            <span className="text-sm font-medium">Log out</span>
+          </Button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Bar */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
-          <h2 className="text-lg font-semibold text-slate-700">管理后台</h2>
-          <div className="flex items-center space-x-4">
-            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-              <span className="text-blue-600 text-sm font-medium">A</span>
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <header className="h-14 bg-background border-b border-border flex items-center justify-between px-6 shrink-0 z-10 sticky top-0">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <span className="text-muted-foreground text-xs font-mono">projects</span>
+            <ChevronRight className="w-3 h-3 text-muted-foreground/30" />
+            <span className="text-foreground text-sm font-bold tracking-tight truncate">starter-baseline</span>
+            <div className="hidden sm:flex items-center ml-4 px-2 py-1 rounded bg-muted border border-border gap-2 group cursor-pointer transition-colors hover:border-foreground/20">
+              <Search className="w-3 h-3 text-muted-foreground" />
+              <span className="text-[11px] text-muted-foreground">Search...</span>
+              <div className="flex items-center gap-0.5 ml-2">
+                <Command className="w-2.5 h-2.5 text-muted-foreground/50" />
+                <span className="text-[10px] text-muted-foreground/50 font-mono">K</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 px-2 py-1 rounded-full border border-border hover:bg-muted transition-colors cursor-pointer pr-1">
+              <div className="w-6 h-6 bg-foreground text-background rounded-full flex items-center justify-center text-[10px] font-bold">
+                AD
+              </div>
+              <span className="text-xs font-bold mr-1">Admin</span>
             </div>
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-auto p-6">
-          <Outlet />
+        <main className="flex-1 overflow-auto bg-muted/20 vercel-grid">
+          <div className="max-w-[1200px] mx-auto p-8 animate-in fade-in duration-500">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
   );
 }
+
+

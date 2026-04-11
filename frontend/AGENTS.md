@@ -4,7 +4,8 @@
 
 - **框架**: React 19 + TypeScript（严格模式）
 - **构建**: Vite
-- **样式**: TailwindCSS v4（使用 `@import "tailwindcss"` 语法）
+- **样式**: TailwindCSS v4 + **shadcn/ui** 组件库
+- **设计**: 支持现代化、高美感的 UI 设计（参考 `frontend-design` 规范）
 - **路由**: React Router v6
 - **HTTP**: Axios（封装在 `src/api/client.ts`）
 - **状态管理**: Zustand
