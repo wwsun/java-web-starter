@@ -23,7 +23,8 @@ public class RoleController {
 
     private final RoleService roleService;
 
-    @Operation(summary = "查询所有角色")
+    @Operation(summary = "查询所有角色（仅管理员）")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/roles")
     public Result<List<RoleVO>> listRoles() {
         return Result.success(roleService.listAll());

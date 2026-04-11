@@ -42,4 +42,11 @@ public interface UserService extends IService<User> {
      * 更新用户信息（仅更新非空字段）
      */
     UserVO updateUserInfo(String username, UpdateUserRequest request);
+
+    /**
+     * 删除用户并清除缓存
+     *
+     * @throws com.music163.starter.common.exception.BusinessException 用户不存在时
+     */
+    void deleteUser(Long id);
 }

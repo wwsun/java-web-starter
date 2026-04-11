@@ -35,6 +35,7 @@ public class UserController {
     private final RoleService roleService;
 
     @Operation(summary = "分页查询用户列表")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public Result<IPage<UserVO>> listUsers(
             @Parameter(description = "页码") @RequestParam(defaultValue = "1") int page,
@@ -89,7 +90,7 @@ public class UserController {
         if (currentUser != null && currentUser.getId().equals(id)) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "不能删除当前登录用户");
         }
-        userService.removeById(id);
+        userService.deleteUser(id);
         return Result.success();
     }
 

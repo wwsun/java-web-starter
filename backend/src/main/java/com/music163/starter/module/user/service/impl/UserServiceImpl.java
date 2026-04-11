@@ -15,10 +15,13 @@ import com.music163.starter.module.user.vo.UserVO;
 import com.music163.starter.security.dto.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 用户 Service 实现
@@ -31,6 +34,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     // 注意：不重复注入 UserMapper，通过 ServiceImpl 的 baseMapper 访问
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
+    private final CacheManager cacheManager;
 
     @Override
     @Cacheable(value = "user", key = "#username", unless = "#result == null")
@@ -44,6 +48,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    @Transactional
     public void register(RegisterRequest request) {
         if (baseMapper.selectByUsername(request.getUsername()) != null) {
             throw new BusinessException(ResultCode.USER_ALREADY_EXISTS);
@@ -101,5 +106,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         updateById(user);
         return UserVO.from(user);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUser(Long id) {
+        User user = getById(id);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+        removeById(id);
+        // 手动清缓存：@CacheEvict 无法用于 key 为运行时变量的场景，此处通过 CacheManager 直接操作
+        Cache cache = cacheManager.getCache("user");
+        if (cache != null) {
+            cache.evict(user.getUsername());
+        }
     }
 }
