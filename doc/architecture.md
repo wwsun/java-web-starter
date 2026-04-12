@@ -44,7 +44,7 @@ Mapper 层        职责：数据库访问，继承 BaseMapper<Entity>
 ## 认证机制（双令牌）
 
 ```
-登录 POST /auth/login
+登录 POST /api/auth/login
   → Spring Security 验证用户名密码
   → 生成 access_token（type=access，1h）+ refresh_token（type=refresh，7d）
   → 返回 TokenResponse
@@ -54,7 +54,7 @@ Mapper 层        职责：数据库访问，继承 BaseMapper<Entity>
   → validateAccessToken()：校验签名 + 未过期 + type == "access"
   → 设置 SecurityContext
 
-Token 刷新 POST /auth/refresh（携带 refresh_token）
+Token 刷新 POST /api/auth/refresh（携带 refresh_token）
   → validateRefreshToken()：校验签名 + 未过期 + type == "refresh"
   → 生成新的 access_token + refresh_token
 ```
@@ -80,6 +80,45 @@ Token 刷新 POST /auth/refresh（携带 refresh_token）
 1. 业务异常抛 `BusinessException(ResultCode.XXX)` 或 `BusinessException(ResultCode.XXX, "自定义消息")`
 2. `GlobalExceptionHandler` 统一捕获，返回 `Result<Void>`
 3. 新业务模块需要的错误码在 `ResultCode.java` 中注册（建议从 2001 开始，避免与 1xxx 用户相关码冲突）
+4. 限流触发时返回 HTTP 429，错误码 `TOO_MANY_REQUESTS`，并附带 `Retry-After` 响应头
+
+---
+
+## 可观测性
+
+### 请求链路追踪（RequestIdFilter）
+
+每个入站请求自动生成或透传 `X-Request-Id`，写入 MDC 后注入日志，响应头中同步返回：
+
+```
+前端 client.ts  →  X-Request-Id: <uuid>  →  RequestIdFilter → MDC.put("requestId")
+                                                              → 响应头 X-Request-Id
+                                                              → logback pattern: [%X{requestId}]
+```
+
+前端 `client.ts` 的请求拦截器会在每次请求自动注入该头，便于前后端日志联动排查。
+
+### 速率限制（RateLimitFilter）
+
+基于 [Bucket4j](https://bucket4j.com/) 令牌桶算法，对认证接口进行 IP 级限流：
+
+| 接口 | 限额 | 超限响应 |
+|------|------|----------|
+| `POST /api/auth/login` | 5 次 / 分钟 / IP | HTTP 429 + Retry-After |
+| `POST /api/auth/register` | 3 次 / 分钟 / IP | HTTP 429 + Retry-After |
+
+> ⚠️ 当前使用 JVM 内存存储，仅适合单实例。多实例场景需替换为 Bucket4j + Redis。
+
+### API 审计日志（RequestLogAspect）
+
+拦截所有 `@RestController` 方法，自动记录请求摘要：
+
+```
+[REQ]  POST /api/auth/login user=anonymous
+[RESP] POST /api/auth/login user=anonymous cost=42ms
+```
+
+不记录请求参数，避免密码等敏感字段写入日志。
 
 ---
 

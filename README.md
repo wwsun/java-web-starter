@@ -31,8 +31,9 @@ cd ../backend && mvn spring-boot:run
 # docker compose --profile cache up -d redis
 # SPRING_CACHE_TYPE=redis mvn spring-boot:run
 
-# 4. 访问 http://localhost:8080/api
-#    所有页面和 API 由同一个服务提供
+# 4. 访问 http://localhost:8080
+#    Web 首页由根路径提供，后端接口统一挂在 /api
+#    前端业务页统一使用 Hash Router，例如 http://localhost:8080/#/login
 ```
 
 ### 方式二：本地开发（前后端分离）
@@ -58,7 +59,7 @@ docker compose up -d mysql
 1. 使用 IDEA 打开项目根目录 `java-web-starter/`
 2. 将 `backend/` 标记为 Maven 模块，等待依赖下载完成
 3. 运行 `StarterApplication.main()` 启动应用
-4. 访问 API 文档：<http://localhost:8080/api/doc.html>
+4. 访问 API 文档：<http://localhost:8080/doc.html>
 
 **前端**：
 
@@ -98,7 +99,7 @@ docker compose up -d
 # 访问
 # 前端: http://localhost
 # 后端 API: http://localhost/api
-# API 文档: http://localhost:8080/api/doc.html
+# API 文档: http://localhost:8080/doc.html
 ```
 
 ## 项目结构

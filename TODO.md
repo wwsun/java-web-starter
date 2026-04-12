@@ -1,7 +1,15 @@
 # TODO
 
-- [x] 更新 agents.md - <https://www.builder.io/blog/claude-md-guide> - <https://www.builder.io/blog/agents-md>
-- [x] 调整 backend 的项目结构，包深度过大
-- [x] backend 默认是否要 redis 缓存
-- [x] 优化前端实现，去掉冗余的代码
-- [x] skills: web-security skill; 评分 skill
+初始化项目后根据具体的项目需求文档完善 TODO
+
+- [ ] 使用本项目进行初始化，修改相应的包名、类名等
+- [ ] 需求分析：明确核心需求、功能模块、澄清不清楚的需求点
+- [ ] 需求深度分析和解决不明确的点
+- [ ] 定制分阶段实施计划
+- [ ] 数据建模与 DDL 编写
+- [ ] 使用 spec-driven-development 进行开发实现
+- [ ] 前端实现
+- [ ] 安全检查
+- [ ] 性能检查
+- [ ] 测试完善
+- [ ] 评分检查
