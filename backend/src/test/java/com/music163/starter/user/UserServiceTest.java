@@ -7,20 +7,24 @@ import com.music163.starter.user.UserMapper;
 import com.music163.starter.user.UserServiceImpl;
 import com.music163.starter.user.UserVO;
 import com.music163.starter.user.dto.ChangePasswordRequest;
+import com.music163.starter.user.dto.UpdateUserRequest;
 import com.music163.starter.auth.dto.RegisterRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 
 import org.springframework.test.util.ReflectionTestUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -38,6 +42,9 @@ class UserServiceTest {
 
     @Mock
     private CacheManager cacheManager;
+
+    @Mock
+    private Cache cache;
 
     private UserServiceImpl userService;
 
@@ -133,5 +140,79 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.changePassword("testuser", request))
                 .isInstanceOf(BusinessException.class);
+    }
+
+    // ===== updateUserInfo =====
+
+    @Test
+    void updateUserInfo_shouldOnlyUpdateNonNullFields() {
+        UpdateUserRequest request = new UpdateUserRequest();
+        request.setNickname("New Name");
+        // email / phone / avatar 均未传，不应被覆盖
+
+        User user = User.builder()
+                .username("testuser")
+                .nickname("Old Name")
+                .email("old@example.com")
+                .phone("13800138000")
+                .build();
+        given(userMapper.selectByUsername("testuser")).willReturn(user);
+        given(userMapper.updateById(any(User.class))).willReturn(1);
+
+        UserVO result = userService.updateUserInfo("testuser", request);
+
+        assertThat(result.getNickname()).isEqualTo("New Name");
+        assertThat(result.getEmail()).isEqualTo("old@example.com");
+        assertThat(result.getPhone()).isEqualTo("13800138000");
+        verify(userMapper).updateById(any(User.class));
+    }
+
+    // ===== deleteUser =====
+
+    @Test
+    void deleteUser_notFound_shouldThrowBusinessException() {
+        given(userMapper.selectByUsername("adminUser")).willReturn(null);
+        given(userMapper.selectById(99L)).willReturn(null);
+
+        assertThatThrownBy(() -> userService.deleteUser(99L, "adminUser"))
+                .isInstanceOf(BusinessException.class);
+    }
+
+    @Test
+    void deleteUser_success_shouldEvictCache() {
+        User user = User.builder()
+                .id(1L)
+                .username("testuser")
+                .build();
+        given(userMapper.selectByUsername("adminUser")).willReturn(null);
+        given(userMapper.selectById(1L)).willReturn(user);
+        given(userMapper.deleteById(1L)).willReturn(1);
+        given(cacheManager.getCache("user")).willReturn(cache);
+
+        userService.deleteUser(1L, "adminUser");
+
+        verify(cache).evict("testuser");
+    }
+
+    // ===== register（角色分配）=====
+
+    @Test
+    void register_shouldAssignDefaultRole() {
+        RegisterRequest request = new RegisterRequest();
+        request.setUsername("newuser");
+        request.setPassword("password123");
+
+        given(userMapper.selectByUsername("newuser")).willReturn(null);
+        given(passwordEncoder.encode("password123")).willReturn("hashed");
+        // 模拟 MyBatis-Plus 自动填充 id
+        given(userMapper.insert(any(User.class))).willAnswer(invocation -> {
+            User u = invocation.getArgument(0);
+            ReflectionTestUtils.setField(u, "id", 1L);
+            return 1;
+        });
+
+        userService.register(request);
+
+        verify(roleService).assignDefaultRole(1L);
     }
 }

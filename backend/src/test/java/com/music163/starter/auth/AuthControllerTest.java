@@ -70,7 +70,7 @@ class AuthControllerTest {
         req.setUsername("admin");
         req.setPassword("admin123");
 
-        mockMvc.perform(post("/auth/login")
+        mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
@@ -88,7 +88,7 @@ class AuthControllerTest {
         req.setUsername("admin");
         req.setPassword("wrongpass");
 
-        mockMvc.perform(post("/auth/login")
+        mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(jsonPath("$.code").value(ResultCode.INVALID_CREDENTIALS.getCode()));
@@ -103,7 +103,7 @@ class AuthControllerTest {
         req.setUsername("existing");
         req.setPassword("password123");
 
-        mockMvc.perform(post("/auth/register")
+        mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(jsonPath("$.code").value(ResultCode.USER_ALREADY_EXISTS.getCode()));
@@ -113,8 +113,24 @@ class AuthControllerTest {
     void refresh_withAccessToken_shouldReturnTokenInvalid() throws Exception {
         given(jwtTokenProvider.validateRefreshToken("access-token")).willReturn(false);
 
-        mockMvc.perform(post("/auth/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .header("Authorization", "Bearer access-token"))
                 .andExpect(jsonPath("$.code").value(ResultCode.TOKEN_INVALID.getCode()));
+    }
+
+    @Test
+    void refresh_success_shouldReturnNewTokens() throws Exception {
+        given(jwtTokenProvider.validateRefreshToken("refresh-token")).willReturn(true);
+        given(jwtTokenProvider.getUsernameFromToken("refresh-token")).willReturn("testuser");
+        given(jwtTokenProvider.generateAccessToken("testuser")).willReturn("new-access-token");
+        given(jwtTokenProvider.generateRefreshToken("testuser")).willReturn("new-refresh-token");
+        given(jwtTokenProvider.getAccessTokenExpiration()).willReturn(3_600_000L);
+
+        mockMvc.perform(post("/api/auth/refresh")
+                        .header("Authorization", "Bearer refresh-token"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.accessToken").value("new-access-token"))
+                .andExpect(jsonPath("$.data.refreshToken").value("new-refresh-token"))
+                .andExpect(jsonPath("$.data.expiresIn").value(3600));
     }
 }

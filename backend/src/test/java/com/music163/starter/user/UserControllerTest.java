@@ -78,11 +78,11 @@ class UserControllerTest {
         given(userDetailsService.loadUserByUsername(TestJwtHelper.TEST_USERNAME)).willReturn(ud);
     }
 
-    // ===== GET /users/me =====
+        // ===== GET /api/users/me =====
 
     @Test
     void getCurrentUser_whenNotAuthenticated_shouldReturn401() throws Exception {
-        mockMvc.perform(get("/users/me"))
+        mockMvc.perform(get("/api/users/me"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -93,14 +93,14 @@ class UserControllerTest {
         given(userService.findByUsername(TestJwtHelper.TEST_USERNAME)).willReturn(user);
         given(roleService.getRoleCodesByUserId(1L)).willReturn(List.of("ADMIN"));
 
-        mockMvc.perform(get("/users/me").header("Authorization", AUTH_HEADER))
+        mockMvc.perform(get("/api/users/me").header("Authorization", AUTH_HEADER))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.username").value(TestJwtHelper.TEST_USERNAME))
                 .andExpect(jsonPath("$.data.password").doesNotExist())
                 .andExpect(jsonPath("$.data.roles[0]").value("ADMIN"));
     }
 
-    // ===== DELETE /users/{id} =====
+        // ===== DELETE /api/users/{id} =====
 
     @Test
     void deleteUser_whenNotAdmin_shouldReturn403() throws Exception {
@@ -112,7 +112,7 @@ class UserControllerTest {
         given(userDetailsService.loadUserByUsername(TestJwtHelper.TEST_USERNAME))
                 .willReturn(userOnly);
 
-        mockMvc.perform(delete("/users/2").header("Authorization", AUTH_HEADER))
+        mockMvc.perform(delete("/api/users/2").header("Authorization", AUTH_HEADER))
                 .andExpect(status().isForbidden());
     }
 
@@ -121,13 +121,13 @@ class UserControllerTest {
         doThrow(new BusinessException(ResultCode.BAD_REQUEST, "不能删除当前登录用户"))
                 .when(userService).deleteUser(eq(1L), eq(TestJwtHelper.TEST_USERNAME));
 
-        mockMvc.perform(delete("/users/1").header("Authorization", AUTH_HEADER))
+        mockMvc.perform(delete("/api/users/1").header("Authorization", AUTH_HEADER))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.message").value("不能删除当前登录用户"));
     }
 
-    // ===== PUT /users/me/password =====
+        // ===== PUT /api/users/me/password =====
 
     @Test
     void changePassword_whenOldPasswordWrong_shouldReturnError() throws Exception {
@@ -138,7 +138,7 @@ class UserControllerTest {
         req.setOldPassword("wrong");
         req.setNewPassword("newpass123");
 
-        mockMvc.perform(put("/users/me/password")
+        mockMvc.perform(put("/api/users/me/password")
                         .header("Authorization", AUTH_HEADER)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
