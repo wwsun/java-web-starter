@@ -3,6 +3,9 @@
 -- java-web-starter
 -- ============================================
 
+-- 声明客户端使用 utf8mb4，防止中文数据双重编码
+SET NAMES utf8mb4;
+
 CREATE DATABASE IF NOT EXISTS `starter_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE `starter_db`;
