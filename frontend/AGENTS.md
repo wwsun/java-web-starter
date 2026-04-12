@@ -25,8 +25,9 @@
 ## 关键文件
 
 - `vite.config.ts` — Vite 配置（API 代理在此）
-- `src/api/client.ts` — Axios 实例（Token 注入、错误处理）
-- `src/router/index.tsx` — 路由配置
+- `src/api/client.ts` — Axios 实例（Token 注入、401 自动换牌、X-Request-Id 链路追踪注入）
+- `src/router/index.tsx` — 路由配置（**Hash Router 模式**，URL 形如 `/#/login`）
+- `src/mocks/handlers.ts` — MSW Mock 处理器，用于前端无后端独立开发
 
 ## 开发命令
 

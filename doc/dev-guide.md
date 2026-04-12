@@ -91,16 +91,21 @@ com.music163.starter
 ├── common/          # 通用组件
 │   ├── result/      # 统一响应
 │   ├── exception/   # 异常处理
-│   └── config/      # 配置类
-├── security/        # 安全认证
+│   ├── config/      # 配置类
+│   ├── filter/      # Servlet 过滤器（RequestIdFilter、RateLimitFilter）
+│   └── aspect/      # AOP 切面（RequestLogAspect）
+├── security/        # Spring Security 核心配置
 ├── auth/            # 认证模块
-└── module/          # 业务模块
-    └── <module>/
-        ├── controller/
-        ├── service/
-        │   └── impl/
-        ├── mapper/
-        └── entity/
+├── user/            # 用户模块（示例）
+└── <module>/        # 业务模块直接放根包，内部不再套子包
+    ├── <Name>Controller.java
+    ├── <Name>Service.java
+    ├── <Name>ServiceImpl.java   # 与接口同级，不套 impl/
+    ├── <Name>Mapper.java
+    ├── <Name>.java              # Entity
+    ├── <Name>VO.java
+    └── dto/
+        └── <Name>Request.java
 ```
 
 ### 命名约定
@@ -124,13 +129,15 @@ com.music163.starter
 
 ```
 src/
-├── api/        # API 请求封装
-├── components/ # 通用组件
-├── layouts/    # 布局组件
-├── pages/      # 页面组件
-├── router/     # 路由配置
-├── stores/     # 状态管理
-├── hooks/      # 自定义 Hooks
-├── utils/      # 工具函数
-└── types/      # TypeScript 类型
+├── api/          # API 请求封装（client.ts、各模块 API 文件）
+├── components/   # 通用组件（ui/ 存放 shadcn 组件）
+├── constants/    # 常量定义（路由路径等）
+├── hooks/        # 自定义 Hooks
+├── layouts/      # 布局组件
+├── lib/          # 工具函数（shadcn 的 cn 等）
+├── mocks/        # MSW Mock 处理器（前端独立开发）
+├── pages/        # 页面组件
+├── router/       # 路由配置（Hash Router 模式）
+├── stores/       # Zustand 状态管理
+└── test-utils/   # 测试工具（MSW server、vitest setup）
 ```

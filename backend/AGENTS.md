@@ -81,7 +81,9 @@ com.music163.starter
 ├── security          → Spring Security 核心配置
 ├── common.result     → Result<T>, ResultCode
 ├── common.exception  → BusinessException, GlobalExceptionHandler
-└── common.config     → MyBatisPlusConfig, RedisConfig, Knife4jConfig, SecurityBeanConfig
+├── common.config     → MyBatisPlusConfig, RedisConfig, Knife4jConfig, SecurityBeanConfig
+├── common.filter     → RequestIdFilter（链路追踪）, RateLimitFilter（速率限制）
+└── common.aspect     → RequestLogAspect（API 审计日志）
 ```
 
 ## 关键文件

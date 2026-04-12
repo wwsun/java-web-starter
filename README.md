@@ -14,15 +14,14 @@
 
 ### 方式一：快速体验（单服务启动）
 
-前端构建产物内嵌到 Spring Boot 中，只需启动一个后端服务即可体验完整功能。
+前端构建产物由 Spring Boot 在开发环境直接从 `frontend/dist` 提供，只需启动一个后端服务即可体验完整功能。
 
 ```bash
 # 1. 启动数据库
 docker compose up -d mysql
 
-# 2. 构建前端并拷贝到后端静态资源目录
+# 2. 构建前端
 cd frontend && npm install && npm run build
-cp -r dist/* ../backend/src/main/resources/static/
 
 # 3. 启动后端
 cd ../backend && mvn spring-boot:run
@@ -34,7 +33,10 @@ cd ../backend && mvn spring-boot:run
 # 4. 访问 http://localhost:8080
 #    Web 首页由根路径提供，后端接口统一挂在 /api
 #    前端业务页统一使用 Hash Router，例如 http://localhost:8080/#/login
+#.   API 文档访问 http://localhost:8080/doc.html
 ```
+
+说明：开发环境下后端会直接读取 `frontend/dist`，如果你要把前端资源打进后端包体，再执行一次 `cp -r dist/* ../backend/src/main/resources/static/` 后重新构建即可。
 
 ### 方式二：本地开发（前后端分离）
 

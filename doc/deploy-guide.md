@@ -22,11 +22,11 @@ JWT_SECRET=your-256-bit-secret-key-change-in-production
 ### 部署步骤
 
 ```bash
-# 1. 构建并启动默认服务（不含 Redis）
+# 1. 构建并启动所有服务（含 Redis）
 docker compose up -d --build
 
-# 如需启用 Redis 缓存
-# SPRING_CACHE_TYPE=redis docker compose --profile cache up -d --build
+# 若只需本地调试，可单独启动基础设施
+# docker compose up -d mysql redis
 
 # 2. 查看服务状态
 docker compose ps
@@ -61,9 +61,9 @@ docker compose down -v
 | `SPRING_DATASOURCE_URL` | 数据库 JDBC URL | - |
 | `SPRING_DATASOURCE_USERNAME` | 数据库用户名 | - |
 | `SPRING_DATASOURCE_PASSWORD` | 数据库密码 | - |
-| `SPRING_CACHE_TYPE` | 缓存实现类型 | `simple` |
 | `SPRING_DATA_REDIS_HOST` | Redis 主机 | `localhost` |
 | `SPRING_DATA_REDIS_PORT` | Redis 端口 | `6379` |
+| `SPRING_DATA_REDIS_PASSWORD` | Redis 密码（空字符串表示无密码） | `""` |
 | `JWT_SECRET` | JWT 签名密钥（≥256位） | - |
 
 ### 前端环境变量
