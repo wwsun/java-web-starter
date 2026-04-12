@@ -24,6 +24,9 @@ WORKDIR /app
 # 创建非 root 用户 (安全实践：不要让应用以 root 身份运行)
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
+# 预创建日志目录，避免非 root 用户启动时无法写入文件日志
+RUN mkdir -p /app/logs && chown -R appuser:appgroup /app/logs
+
 # 从前面那个 build 阶段，把打好的 Jar 拿过来。
 COPY --from=build /app/target/*.jar app.jar
 
