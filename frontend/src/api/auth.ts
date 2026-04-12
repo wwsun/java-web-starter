@@ -1,5 +1,7 @@
 import client from './client';
 
+// client 的 baseURL 是 /api，这里的 /auth/* 最终会请求到 /api/auth/*。
+
 export interface LoginParams {
   username: string;
   password: string;

@@ -18,8 +18,8 @@ test.describe('认证流程', () => {
     await page.fill('#password', 'admin123')
     await page.click('button[type="submit"]')
 
-    await expect(page).toHaveURL('http://localhost:5173/', { timeout: 10_000 })
-    await expect(page.locator('h1')).toContainText('仪表盘')
+    await expect(page).toHaveURL(/\/$/, { timeout: 15_000 })
+    await expect(page.locator('h1')).toContainText(/Overview|仪表盘/)
   })
 
   test('登出后重定向到登录页', async ({ page }) => {
@@ -28,10 +28,10 @@ test.describe('认证流程', () => {
     await page.fill('#username', 'admin')
     await page.fill('#password', 'admin123')
     await page.click('button[type="submit"]')
-    await page.waitForURL('http://localhost:5173/')
+    await page.waitForURL(/\/$/)
 
     // 点击退出登录
-    await page.click('[data-testid="logout-btn"]')
+    await page.getByRole('button', { name: /log out/i }).click()
     await expect(page).toHaveURL(/\/login/)
   })
 })

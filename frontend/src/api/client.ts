@@ -24,6 +24,10 @@ const bareAxios = axios.create({
 let isRefreshing = false;
 let pendingRequests: Array<(token: string) => void> = [];
 
+function redirectToLogin() {
+  window.location.replace(`${window.location.origin}/#/login`);
+}
+
 // ==================== 请求拦截器 ====================
 client.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
@@ -31,6 +35,10 @@ client.interceptors.request.use(
     const token = useAuthStore.getState().token;
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    // 注入请求关联 ID，便于前后端日志链路追踪
+    if (config.headers) {
+      config.headers['X-Request-Id'] = crypto.randomUUID();
     }
     return config;
   },
@@ -57,7 +65,7 @@ client.interceptors.response.use(
     const { refreshToken: rt, logout, setTokens } = useAuthStore.getState();
     if (!rt) {
       logout();
-      window.location.href = '/login';
+      redirectToLogin();
       return Promise.reject(error);
     }
 
@@ -93,7 +101,7 @@ client.interceptors.response.use(
       return client(error.config);
     } catch {
       logout();
-      window.location.href = '/login';
+      redirectToLogin();
       return Promise.reject(error);
     } finally {
       isRefreshing = false;
