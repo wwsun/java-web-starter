@@ -38,6 +38,34 @@ docker compose up -d redis
 docker compose up -d
 ```
 
+## API 验证与回归测试
+
+使用 `scripts/api.sh` 进行端到端 API 验证，无需每次手动登录：
+
+```bash
+# 加载工具（每个终端会话执行一次）
+source scripts/api.sh
+
+# token 自动缓存（首次调用自动登录，50 分钟内复用）
+api_get /api/users/me
+api_post /api/users -d '{"username":"x","password":"y","email":"x@y.com"}'
+api_put /api/users/1 -d '{"email":"new@x.com"}'
+api_delete /api/users/1
+
+# 其他常用命令
+api_health    # 检查服务是否运行
+api_login     # 强制刷新 token
+api_token     # 查看当前 token
+api_users     # 查询用户列表（支持 api_users 2 20 分页参数）
+```
+
+**环境变量**（覆盖默认值）：
+```bash
+API_BASE_URL=http://localhost:8080  # 默认
+API_USERNAME=admin                  # 默认
+API_PASSWORD=admin123               # 默认
+```
+
 ## 关键约定
 
 - 遵循 Conventional Commits 提交规范
