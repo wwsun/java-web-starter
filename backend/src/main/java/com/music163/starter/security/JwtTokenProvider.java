@@ -73,7 +73,7 @@ public class JwtTokenProvider {
 
     /**
      * 校验 Refresh Token（签名 + 未过期 + type == "refresh"）
-     * 用于 /auth/refresh 接口
+     * 用于 /api/auth/refresh 接口
      */
     public boolean validateRefreshToken(String token) {
         return validateTokenWithType(token, "refresh");

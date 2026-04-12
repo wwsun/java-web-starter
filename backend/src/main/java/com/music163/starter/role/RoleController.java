@@ -18,6 +18,7 @@ import java.util.List;
  */
 @Tag(name = "角色管理", description = "角色查询与用户角色分配")
 @RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class RoleController {
 
