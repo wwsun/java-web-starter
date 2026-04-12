@@ -43,6 +43,8 @@ frontend/dist/
 frontend/dist-ssr/
 frontend/.vite/
 frontend/*.local
+frontend/test-results/
+frontend/playwright-report/
 pnpm-debug.log*
 lerna-debug.log*
 
