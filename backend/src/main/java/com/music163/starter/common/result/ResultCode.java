@@ -28,7 +28,10 @@ public enum ResultCode {
     USER_ALREADY_EXISTS(1002, "用户已存在"),
     INVALID_CREDENTIALS(1003, "用户名或密码错误"),
     TOKEN_EXPIRED(1004, "Token 已过期"),
-    TOKEN_INVALID(1005, "Token 无效");
+    TOKEN_INVALID(1005, "Token 无效"),
+
+    // ==================== 限流 ====================
+    TOO_MANY_REQUESTS(429, "请求过于频繁，请稍后重试");
 
     private final int code;
     private final String message;
