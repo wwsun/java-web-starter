@@ -1,0 +1,25 @@
+.agents/skills/score-app/SKILL.md
+  549536f5e222fee9 5-6,14,16,18-23,49-50,56,58,62-63,69-70,73-77,86-92,96,99-107,111,113,115-121,124,126-127,129,131,133,135-136,139,141,144,146,148-151,154-156,159,161,163-166,170,174,178-189,191,193,202,206,210,212-222,224,228,230,232-233,236,240-241,245,248,250-251,255,257-258,260-261,265,267-268,270-271,275,277-278,280-281,283,285,287-291,300
+docs/superpowers/specs/2026-04-14-score-app-redesign-design.md
+  549536f5e222fee9 1-184
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "20f4d82f0963dbfb90aa0fa3d416cbefd599bf67",
+  "prompts": {
+    "549536f5e222fee9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "acd9e739-7d21-4a40-b186-5b0f9c9f5c34",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "wwsun",
+      "messages": [],
+      "total_additions": 357,
+      "total_deletions": 181,
+      "accepted_lines": 334,
+      "overriden_lines": 0
+    }
+  }
+}
