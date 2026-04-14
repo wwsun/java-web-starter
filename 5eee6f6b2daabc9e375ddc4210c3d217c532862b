@@ -1,0 +1,31 @@
+frontend/src/router/index.tsx
+  8fb428b1d6847ecc 5,31-38
+frontend/src/mocks/handlers.ts
+  8fb428b1d6847ecc 74-78
+frontend/src/pages/UserListPage.test.tsx
+  8fb428b1d6847ecc 1-87
+frontend/src/pages/UserListPage.tsx
+  8fb428b1d6847ecc 1-134
+frontend/src/api/user.ts
+  8fb428b1d6847ecc 14-21,29-35,38-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "5eee6f6b2daabc9e375ddc4210c3d217c532862b",
+  "prompts": {
+    "8fb428b1d6847ecc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "496730b1-700b-403a-8502-b57b5acf65ca",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "wwsun",
+      "messages": [],
+      "total_additions": 258,
+      "total_deletions": 10,
+      "accepted_lines": 1273,
+      "overriden_lines": 0
+    }
+  }
+}
