@@ -71,4 +71,9 @@ export const handlers = [
       },
     });
   }),
+
+  // 删除用户（仅示意，Mock 直接返回成功）
+  http.delete('/api/users/:id', () => {
+    return HttpResponse.json({ code: 200, message: '操作成功', data: null });
+  }),
 ];
