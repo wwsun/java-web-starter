@@ -78,6 +78,33 @@ class UserControllerTest {
         given(userDetailsService.loadUserByUsername(TestJwtHelper.TEST_USERNAME)).willReturn(ud);
     }
 
+    // ===== GET /api/users/{id} =====
+
+    @Test
+    void getUser_whenNonAdmin_shouldReturn403() throws Exception {
+        UserDetails userOnly = org.springframework.security.core.userdetails.User
+                .withUsername(TestJwtHelper.TEST_USERNAME)
+                .password("pass")
+                .roles("USER")
+                .build();
+        given(userDetailsService.loadUserByUsername(TestJwtHelper.TEST_USERNAME))
+                .willReturn(userOnly);
+
+        mockMvc.perform(get("/api/users/1").header("Authorization", AUTH_HEADER))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void getUser_whenAdmin_shouldReturnUserVO() throws Exception {
+        User user = User.builder().id(1L).username("target").nickname("Target").status(1).build();
+        given(userService.getById(1L)).willReturn(user);
+
+        mockMvc.perform(get("/api/users/1").header("Authorization", AUTH_HEADER))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.username").value("target"))
+                .andExpect(jsonPath("$.data.password").doesNotExist());
+    }
+
         // ===== GET /api/users/me =====
 
     @Test

@@ -44,7 +44,8 @@ public class UserController {
         return Result.success(result.convert(UserVO::from));
     }
 
-    @Operation(summary = "根据 ID 查询用户")
+    @Operation(summary = "根据 ID 查询用户（仅管理员）")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public Result<UserVO> getUser(@PathVariable Long id) {
         User user = userService.getById(id);
