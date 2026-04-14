@@ -1,0 +1,23 @@
+backend/src/test/java/com/music163/starter/role/RoleControllerTest.java
+  8fb428b1d6847ecc 135-136
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "9d3566bf785dcf2ba6462c16b1250637a507a538",
+  "prompts": {
+    "8fb428b1d6847ecc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "496730b1-700b-403a-8502-b57b5acf65ca",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "wwsun",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 1,
+      "accepted_lines": 1017,
+      "overriden_lines": 0
+    }
+  }
+}
