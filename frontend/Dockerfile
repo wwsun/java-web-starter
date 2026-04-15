@@ -1,7 +1,7 @@
 # ==========================================
 # Stage 1: Build
 # ==========================================
-FROM node:20-alpine AS build
+FROM docker.m.daocloud.io/library/node:20-alpine AS build
 
 WORKDIR /app
 COPY package.json package-lock.json ./

@@ -1,7 +1,7 @@
 # ==========================================
 # Stage 1: Build
 # ==========================================
-FROM maven:3.9-eclipse-temurin-21 AS build
+FROM docker.m.daocloud.io/library/maven:3.9-eclipse-temurin-21 AS build
 
 # 容器里的工作目录切换到 /app
 WORKDIR /app
@@ -17,7 +17,7 @@ RUN mvn package -DskipTests -B
 # ==========================================
 # Stage 2: Runtime
 # ==========================================
-FROM eclipse-temurin:21-jre-alpine
+FROM docker.m.daocloud.io/library/eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
