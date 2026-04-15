@@ -13,7 +13,7 @@ RUN npm run build
 # ==========================================
 # Stage 2: Serve with Nginx
 # ==========================================
-FROM nginx:alpine
+FROM docker.m.daocloud.io/library/nginx:alpine
 
 # Remove default nginx config
 RUN rm /etc/nginx/conf.d/default.conf
