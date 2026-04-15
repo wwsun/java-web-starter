@@ -89,6 +89,7 @@ services:
       SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       APP_CORS_ALLOWED_ORIGINS: http://localhost:5173,http://localhost:8090
       JWT_SECRET: ${JWT_SECRET:-your-256-bit-secret-key-change-in-production}
+      SPRING_CACHE_TYPE: redis
     entrypoint:
       [
         "sh",
