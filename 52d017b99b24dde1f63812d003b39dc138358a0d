@@ -1,0 +1,49 @@
+docker-compose.yml
+  22af795310405cd0 92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "52d017b99b24dde1f63812d003b39dc138358a0d",
+  "prompts": {
+    "22af795310405cd0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e578dded-670a-460d-8109-5a5578119897",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "wwsun",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "8fb428b1d6847ecc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "496730b1-700b-403a-8502-b57b5acf65ca",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "wwsun",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 67,
+      "overriden_lines": 0
+    },
+    "f985ffcd6ef0219e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8216ce5d-7565-466f-8ff3-748b4d6141e7",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "wwsun",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 64,
+      "overriden_lines": 0
+    }
+  }
+}
