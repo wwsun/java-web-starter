@@ -1,0 +1,70 @@
+README.md
+  f985ffcd6ef0219e 13,15-27,42,55-98,101,109,112,121
+docker-compose.yml
+  f985ffcd6ef0219e 63,90
+docs/superpowers/specs/2026-04-15-developer-onboarding-design.md
+  22af795310405cd0 1-224
+docs/superpowers/plans/2026-04-14-scaffold-improvements.md
+  8fb428b1d6847ecc 1-794
+frontend/src/pages/LoginPage.tsx
+  5f153b52082ac587 3,19,108,112,115-123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "b9ad6574afabb6a48ed0e4089f679207988a63b7",
+  "prompts": {
+    "22af795310405cd0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e578dded-670a-460d-8109-5a5578119897",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "wwsun",
+      "messages": [],
+      "total_additions": 224,
+      "total_deletions": 0,
+      "accepted_lines": 224,
+      "overriden_lines": 0
+    },
+    "5f153b52082ac587": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32b79bf2-d04f-46ec-8164-48cef30a2d13",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "wwsun",
+      "messages": [],
+      "total_additions": 13,
+      "total_deletions": 3,
+      "accepted_lines": 13,
+      "overriden_lines": 0
+    },
+    "8fb428b1d6847ecc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "496730b1-700b-403a-8502-b57b5acf65ca",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "wwsun",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 859,
+      "overriden_lines": 0
+    },
+    "f985ffcd6ef0219e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8216ce5d-7565-466f-8ff3-748b4d6141e7",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "wwsun",
+      "messages": [],
+      "total_additions": 137,
+      "total_deletions": 164,
+      "accepted_lines": 134,
+      "overriden_lines": 0
+    }
+  }
+}
