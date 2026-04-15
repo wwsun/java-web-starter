@@ -66,6 +66,30 @@ API_USERNAME=admin                  # 默认
 API_PASSWORD=admin123               # 默认
 ```
 
+## 安全和权限
+
+无需提示可直接执行：
+
+- 读取和搜索代码文件
+- 启动 / 停止基础设施容器（`docker compose up/down`）
+- 运行 `scripts/api.sh` 进行 API 验证
+
+先询问确认：
+
+- 安装或删除依赖包（npm / Maven）
+- `git push` 或创建 PR
+- 删除文件或清除持久化数据（`docker compose down -v`）
+- 生产环境部署操作
+
+## PR 检查清单
+
+- 提交信息格式：`type(scope): 描述`（Conventional Commits）
+- 后端：`mvn test` 全部通过
+- 前端：lint、TypeScript 类型检查、单元测试全部通过
+- 无硬编码的密钥或密码
+- 无 `System.out.println`（后端）或残留 `console.log`（前端）
+- 接口变更已更新 Knife4j 文档注解（`@Tag`、`@Operation`）
+
 ## 关键约定
 
 - 遵循 Conventional Commits 提交规范

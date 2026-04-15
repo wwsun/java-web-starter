@@ -102,7 +102,27 @@ mvn spring-boot:run
 
 # 运行全部测试
 mvn test
+
+# 运行单个测试类（推荐，比全量测试快）
+mvn test -Dtest=UserServiceTest
+
+# 运行单个测试方法
+mvn test -Dtest=UserServiceTest#testCreate
 ```
+
+## 安全和权限
+
+无需提示可直接执行：
+
+- 读取和搜索代码文件
+- `mvn clean compile`（编译）
+- 运行单个测试类 `mvn test -Dtest=XxxTest`
+
+先询问确认：
+
+- 修改 `pom.xml` 依赖（添加 / 删除 / 升级）
+- 运行全量测试 `mvn test`
+- `git push` 或创建 PR
 
 ## 关键约定
 

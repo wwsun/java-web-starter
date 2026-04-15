@@ -41,10 +41,16 @@ npm run dev
 # 启动并启用 Mock 数据（无需后端）
 VITE_ENABLE_MOCK=true npm run dev
 
-# 单文件类型检查
+# 单文件类型检查（推荐，比全量快）
+npx tsc --noEmit src/path/to/file.tsx
+
+# 全量类型检查
 npx tsc --noEmit
 
-# Lint
+# Lint（单文件）
+npx eslint src/path/to/file.tsx
+
+# Lint（全量）
 npm run lint
 
 # 运行单个测试文件
@@ -53,3 +59,25 @@ npx vitest run src/path/to/file.test.tsx
 # 构建
 npm run build
 ```
+
+## 安全和权限
+
+无需提示可直接执行：
+
+- 读取和搜索代码文件
+- 单文件类型检查 / lint / 测试
+- 启动开发服务器
+
+先询问确认：
+
+- `npm install` 安装或删除依赖包
+- 全量构建 `npm run build`
+- `git push` 或创建 PR
+
+## PR 检查清单
+
+- 提交信息格式：`type(scope): 描述`（Conventional Commits）
+- TypeScript 类型检查通过（无 `any`）
+- `npm run lint` 通过
+- 无残留 `console.log`（调试专用除外）
+- 无硬编码后端 URL（统一通过 `src/api/client.ts`）
