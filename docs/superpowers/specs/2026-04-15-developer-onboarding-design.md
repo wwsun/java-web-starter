@@ -73,7 +73,7 @@ registry=https://registry.npmmirror.com
 
 2. `application-prod.yml`（已有）保持 `cache.type: redis` 不变，生产 Docker 部署行为不受影响。
 
-3. `docker-compose.yml` 中 `backend` 的 `depends_on` 保留对 `redis` 的依赖（`docker compose up` 走 prod profile，Redis 仍为必要组件）。需要修正的仅是文档措辞。
+3. `docker-compose.yml` 中 `backend` 的 `depends_on` 移除对 `redis` 的条件依赖，仅保留 `mysql`。Redis 服务本身保留在 compose 中供生产使用，但不再阻塞 backend 启动。
 
 4. `README` 更新措辞：  
    - 原：`若需启用 Redis 缓存支持：docker compose up -d redis`  
@@ -210,6 +210,7 @@ make frontend     # Step 3：启动前端（新终端）
 | `.mvn/settings.xml` | 新增 | A2 |
 | `frontend/.npmrc` | 新增 | A3 |
 | `backend/src/main/resources/application-dev.yml` | 修改 cache.type | B1 |
+| `docker-compose.yml` | 移除 backend depends_on redis | B1 |
 | `README.md` | 多处修改 | B1、B2、D1、D2、E1 |
 | `.env.example` | 追加变量 | C1 |
 | `frontend/.env.example` | 新增 | C2 |
@@ -221,4 +222,4 @@ make frontend     # Step 3：启动前端（新终端）
 
 - **E2 数据库迁移版本管理**（引入 Flyway）：延期，需单独立项
 - `nginx/default.conf`：无需修改
-- `docker-compose.yml`：仅 B1 涉及文档侧修正，compose 文件本身不改
+- `docker-compose.yml`：移除 backend depends_on redis（B1）
