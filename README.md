@@ -2,6 +2,9 @@
 
 企业内部管理系统前后端分离脚手架。内置用户管理、角色权限、JWT 双令牌认证，`fork` 后即可快速启动新项目。
 
+> **使用前必读**：本仓库为脚手架模板，后端包名默认为 `com.music163.starter`。
+> fork 新项目后，请先按 [TODO.md](TODO.md) 第 0 步完成包名替换，再开始开发。
+
 ## 技术栈
 
 | 层 | 技术 |
@@ -20,37 +23,51 @@
 docker compose up -d --build
 ```
 
-约 2 分钟后访问 **http://localhost:8090**（默认账号：`admin / admin123`）。
+> 首次构建需下载依赖，耗时约 **10~20 分钟**；后续重启约 1 分钟。
+> 可用 `docker compose logs -f backend` 实时观察启动进度，看到 `Started Application` 即表示就绪。
+
+启动后访问 **http://localhost:8090**（默认账号：`admin / admin123`）。
 
 > 查看启动状态：`docker compose ps` · 查看后端日志：`docker compose logs -f backend`
 
 ## 本地开发
 
-**前置条件**：JDK 21、Node.js 20+、Docker
+**前置条件**：[sdkman](https://sdkman.io)、Node.js 20+、Docker 24+
+
+**Step 0：安装 sdkman 并配置 Java + Maven 版本**
+
+```bash
+# 安装 sdkman（已安装跳过）
+curl -s "https://get.sdkman.io" | bash
+source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+# 在 backend/ 目录下自动安装并切换到项目指定版本（Java 21 + Maven 3.9）
+cd backend && sdk env install
+```
 
 **Step 1：启动数据库**
 
 ```bash
-docker compose up -d mysql
+make dev-db
 ```
 
-**Step 2：启动后端**
+**Step 2：启动后端**（新终端）
 
 ```bash
-cd backend
-mvn spring-boot:run
+make backend
 # API 文档：http://localhost:8080/doc.html
 ```
 
-**Step 3：启动前端**
+**Step 3：启动前端**（新终端）
 
 ```bash
-cd frontend
-npm install
-npm run dev
+make frontend
 # 浏览器访问 http://localhost:5173
 # 默认账号：admin / admin123
 ```
+
+> 本地开发无需启动 Redis（dev profile 使用内存缓存）。
+> 生产部署（`docker compose up`）自动启用 Redis。
 
 > 纯前端开发（不依赖后端）：`VITE_ENABLE_MOCK=true npm run dev`
 
@@ -69,33 +86,30 @@ api_get /api/users/me     # token 自动缓存，首次调用自动登录
 **Step 1：配置生产环境变量**
 
 ```bash
-# 创建 .env 文件（覆盖 docker-compose.yml 中的默认值）
-cat > .env <<EOF
-MYSQL_ROOT_PASSWORD=your-strong-password
-JWT_SECRET=your-256-bit-secret-key-change-in-production
-EOF
+cp .env.example .env
+# 编辑 .env，填入真实密码和密钥
 ```
 
 **Step 2：构建并启动**
 
 ```bash
-docker compose up -d --build
+make up
 ```
 
 **Step 3：验证**
 
 ```bash
 docker compose ps
-# 浏览器访问 http://your-server-ip:8090（如已用 80 端口改为不冲突的端口）
+# 浏览器访问 http://your-server-ip:8090
 ```
 
 常用维护命令：
 
 ```bash
-docker compose logs -f backend    # 查看后端日志
+make logs                                          # 查看后端日志
 docker compose pull && docker compose up -d --build   # 更新部署
-docker compose down               # 停止服务
-docker compose down -v            # 停止并清除持久化数据（慎用）
+make down                                          # 停止服务
+docker compose down -v                             # 停止并清除持久化数据（慎用）
 ```
 
 详细环境变量说明、CI/CD 模板及数据库管理见 [部署指南](doc/deploy-guide.md)。
@@ -109,6 +123,7 @@ doc/         → 架构设计、API 规范、开发指南
 scripts/     → 开发辅助脚本（api.sh：API 调试与回归测试）
 nginx/       → Nginx 反向代理配置
 docker-compose.yml
+Makefile     → 常用开发命令入口（make help 查看）
 TODO.md      → 基于本脚手架新建项目的初始化清单
 ```
 
@@ -123,9 +138,5 @@ TODO.md      → 基于本脚手架新建项目的初始化清单
 ## 运行测试
 
 ```bash
-# 后端
-cd backend && mvn test
-
-# 前端
-cd frontend && npm run test:run
+make test
 ```
