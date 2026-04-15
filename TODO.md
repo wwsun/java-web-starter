@@ -23,9 +23,25 @@
 
 ### 执行
 
-- [ ] 使用本项目初始化新仓库
-- [ ] 替换后端包名（默认 `com.music163.starter`）与模块命名
-- [ ] 替换前端应用名、页面标题、导航文案中的脚手架占位信息
+**后端包名替换**（46 个文件，建议用 IDE 的 Refactor > Rename 功能）
+
+- [ ] `backend/pom.xml` — `<groupId>` 和 `<artifactId>`
+- [ ] `backend/src/main/java/com/music163/starter/` — 用 IDE 重命名整个包，自动更新所有 import
+- [ ] `backend/src/main/resources/application.yml` — `spring.application.name`
+- [ ] `backend/src/main/resources/application-dev.yml` — logging `com.music163.starter` 包路径
+- [ ] `backend/src/main/resources/application-prod.yml` — logging 包路径
+
+> 快速验证：`grep -r "music163" backend/src --include="*.java" --include="*.xml" --include="*.yml"` 应无输出
+
+**前端应用名替换**
+
+- [ ] `frontend/index.html` 第 7 行：`<title>frontend</title>` → 改为实际应用名
+- [ ] `frontend/package.json` 第 2 行：`"name": "frontend"` → 改为实际项目名
+- [ ] `frontend/src/layouts/MainLayout.tsx` 第 30 行：`WebStarter` → 侧边栏显示名称
+- [ ] `frontend/src/layouts/MainLayout.tsx` 第 87 行：`starter-baseline` → 顶部 breadcrumb 项目名
+
+**环境验证**
+
 - [ ] 按 `README.md` 完成本地启动验证（后端、前端、数据库）
 
 ### 推荐工具
@@ -38,7 +54,7 @@
 ### 产出与验收
 
 - [ ] 新项目可在本地启动并访问
-- [ ] 不再出现 starter/demo 占位文案
+- [ ] `grep -r "music163\|WebStarter\|starter-baseline" backend/src frontend/src` 无输出
 - [ ] 初始化变更有独立提交（便于追溯）
 
 ---

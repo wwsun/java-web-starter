@@ -1,80 +1,105 @@
 # 部署指南
 
-## Docker Compose 部署
-
-### 环境要求
+## 环境要求
 
 - Docker 24+
 - Docker Compose v2
 
-### 配置环境变量
+---
 
-创建 `.env` 文件：
+## 快速部署
+
+### Step 1：配置环境变量
 
 ```bash
-# MySQL
-MYSQL_ROOT_PASSWORD=your-strong-password
-
-# JWT
-JWT_SECRET=your-256-bit-secret-key-change-in-production
+cp .env.example .env
 ```
 
-### 部署步骤
+打开 `.env`，填入生产值：
+
+| 变量 | 说明 | 生成命令 |
+|------|------|---------|
+| `MYSQL_ROOT_PASSWORD` | MySQL root 密码 | — |
+| `JWT_SECRET` | JWT 签名密钥（≥256 位） | `openssl rand -hex 32` |
+| `REDIS_PASSWORD` | Redis 密码（留空=无密码） | — |
+| `APP_CORS_ALLOWED_ORIGINS` | 前端来源，多个用逗号分隔 | — |
+
+> `⚠️` `.env` 已加入 `.gitignore`，请勿提交到版本库。
+
+### Step 2：构建并启动
 
 ```bash
-# 1. 构建并启动所有服务（含 Redis）
-docker compose up -d --build
+make up
+```
 
-# 若只需本地调试，可单独启动基础设施
-# docker compose up -d mysql redis
+等价于 `docker compose up -d --build`。首次构建需下载依赖，约 10～20 分钟。
 
-# 2. 查看服务状态
+### Step 3：验证
+
+```bash
 docker compose ps
-
-# 3. 查看日志
-docker compose logs -f backend
-docker compose logs -f frontend
-
-# 4. 停止服务
-docker compose down
-
-# 5. 停止并清除数据
-docker compose down -v
 ```
 
-### 服务端口
+所有服务状态应为 `Up`，访问 `http://your-server-ip:8090`。
 
-| 服务 | 端口 | 说明 |
-| --- | --- | --- |
-| Nginx | 80 | 反向代理入口 |
-| Backend | 8080 | Spring Boot API |
-| MySQL | 3306 | 数据库 |
-| Redis | 6379 | 可选缓存服务 |
+---
 
-## 环境变量说明
+## 服务端口
 
-### 后端环境变量
+| 服务 | 宿主机端口 | 容器端口 | 说明 |
+|------|----------|---------|------|
+| Nginx | 8090 | 80 | 反向代理入口（前端 + API） |
+| Backend | 8080 | 8080 | Spring Boot（调试用，生产可关闭） |
+| MySQL | 3306 | 3306 | 数据库 |
+| Redis | 6379 | 6379 | 缓存 |
+
+> 如需改 Nginx 宿主机端口，修改 `docker-compose.yml` 中 `nginx.ports` 和 `.env` 中 `APP_CORS_ALLOWED_ORIGINS` 里的端口号。
+
+---
+
+## 常用维护命令
+
+```bash
+make logs                        # 查看后端日志（实时）
+docker compose logs -f frontend  # 查看前端日志
+docker compose ps                # 查看服务状态
+
+make down                        # 停止所有服务（保留数据）
+docker compose down -v           # 停止并清除持久化数据（慎用，数据不可恢复）
+
+docker compose pull && make up   # 拉取新镜像并更新部署
+docker compose restart backend   # 仅重启后端（改了环境变量后用）
+```
+
+---
+
+## 环境变量完整说明
+
+### 后端（Spring Boot）
 
 | 变量 | 说明 | 默认值 |
-| --- | --- | --- |
-| `SPRING_PROFILES_ACTIVE` | 激活的配置文件 | `dev` |
-| `SPRING_DATASOURCE_URL` | 数据库 JDBC URL | - |
-| `SPRING_DATASOURCE_USERNAME` | 数据库用户名 | - |
-| `SPRING_DATASOURCE_PASSWORD` | 数据库密码 | - |
-| `SPRING_DATA_REDIS_HOST` | Redis 主机 | `localhost` |
+|------|------|--------|
+| `SPRING_PROFILES_ACTIVE` | 激活的配置文件 | `prod` |
+| `SPRING_DATASOURCE_URL` | 数据库 JDBC URL | 容器内 mysql 服务 |
+| `SPRING_DATASOURCE_USERNAME` | 数据库用户名 | `root` |
+| `SPRING_DATASOURCE_PASSWORD` | 数据库密码（同 `MYSQL_ROOT_PASSWORD`） | — |
+| `SPRING_DATA_REDIS_HOST` | Redis 主机 | `redis` |
 | `SPRING_DATA_REDIS_PORT` | Redis 端口 | `6379` |
-| `SPRING_DATA_REDIS_PASSWORD` | Redis 密码（空字符串表示无密码） | `""` |
-| `JWT_SECRET` | JWT 签名密钥（≥256位） | - |
+| `SPRING_DATA_REDIS_PASSWORD` | Redis 密码 | `""` |
+| `APP_CORS_ALLOWED_ORIGINS` | 允许的前端来源（逗号分隔） | `http://localhost:5173,http://localhost:8090` |
+| `JWT_SECRET` | JWT 签名密钥（≥256 位） | — |
 
-### 前端环境变量
+### 前端（构建时注入）
 
 | 变量 | 说明 | 默认值 |
-| --- | --- | --- |
-| `VITE_ENABLE_MOCK` | 启用 MSW Mock | `false` |
+|------|------|--------|
+| `VITE_ENABLE_MOCK` | 启用 MSW Mock（仅本地开发） | `false` |
 
-## CI/CD 接入指引
+---
 
-### GitHub Actions 模板
+## CI/CD 接入
+
+GitHub Actions 示例（`.github/workflows/ci.yml`）：
 
 ```yaml
 name: CI/CD
@@ -95,9 +120,7 @@ jobs:
           distribution: temurin
           java-version: 21
           cache: maven
-      - name: Build & Test
-        working-directory: backend
-        run: mvn clean verify -B
+      - run: cd backend && mvn clean verify -B
 
   frontend:
     runs-on: ubuntu-latest
@@ -108,43 +131,48 @@ jobs:
           node-version: 20
           cache: npm
           cache-dependency-path: frontend/package-lock.json
-      - name: Install & Build
-        working-directory: frontend
-        run: |
-          npm ci
-          npm run build
+      - run: cd frontend && npm ci && npm run build
 
   deploy:
     needs: [backend, frontend]
-    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Deploy
         run: |
-          # 在此添加部署脚本
-          echo "Deploying to production..."
+          # 在此添加部署脚本（SSH、Docker Hub、云厂商 CLI 等）
+          echo "Deploying..."
 ```
+
+---
 
 ## 数据库管理
 
-### 备份
+### 备份与恢复
 
 ```bash
-# 导出数据库
-docker compose exec mysql mysqldump -u root -p starter_db > backup.sql
+# 备份
+docker compose exec mysql mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" starter_db > backup.sql
 
-# 导入数据库
-docker compose exec -T mysql mysql -u root -p starter_db < backup.sql
+# 恢复
+docker compose exec -T mysql mysql -uroot -p"$MYSQL_ROOT_PASSWORD" starter_db < backup.sql
+```
+
+### 重置数据库（清空重建）
+
+```bash
+docker compose down -v          # 删除数据卷
+make up                         # 重新构建并初始化（init.sql 自动执行）
 ```
 
 ### 数据库迁移
 
-目前使用手动 SQL 脚本管理，建议后续引入 Flyway 做版本化管理：
+目前使用手动 SQL 脚本管理，建议后续引入 Flyway 做版本化：
 
 ```
 doc/sql/
-├── init.sql          # 初始化脚本
-├── V2__add_roles.sql # 迭代脚本
-└── V3__add_xxx.sql
+├── init.sql          # 初始化脚本（容器首次启动自动执行）
+├── V2__add_xxx.sql   # 迭代脚本（手动执行）
+└── V3__add_yyy.sql
 ```
