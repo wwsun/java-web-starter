@@ -35,13 +35,9 @@ spring:
           max-idle: 8
           min-idle: 0
 
-  # Cache
+  # Cache（dev 环境使用内存缓存，无需启动 Redis）
   cache:
-    type: redis
-    redis:
-      time-to-live: 3600000
-      key-prefix: "starter:"
-      use-key-prefix: true
+    type: simple
 
 # ====================================
 # JWT Configuration

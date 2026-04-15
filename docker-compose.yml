@@ -98,8 +98,6 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-      redis:
-        condition: service_healthy
 
   # ----------------------------------------
   # Frontend (Nginx serve build assets)
