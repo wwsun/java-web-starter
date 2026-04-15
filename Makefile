@@ -8,7 +8,7 @@ help: ## 显示所有可用命令
 dev-db: ## 启动本地开发数据库（MySQL）
 	docker compose up -d mysql
 
-backend: ## 启动后端开发服务器（需先运行 dev-db）
+backend: ## 启动后端开发服务器（需先运行 dev-db，需 sdkman）
 	cd backend && sdk env && mvn spring-boot:run $(MVN_OPTS)
 
 frontend: ## 启动前端开发服务器
