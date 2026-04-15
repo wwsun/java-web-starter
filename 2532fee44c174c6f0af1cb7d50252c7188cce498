@@ -1,0 +1,55 @@
+frontend/.env.example
+  22af795310405cd0 1-2
+.env.example
+  22af795310405cd0 26-31
+frontend/.npmrc
+  22af795310405cd0 1
+README.md
+  22af795310405cd0 5-7,26-27,29,35-37,39-46,51,54,57,61,64,69-71,89-90,96,103,109,111-112,126,141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "2532fee44c174c6f0af1cb7d50252c7188cce498",
+  "prompts": {
+    "22af795310405cd0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e578dded-670a-460d-8109-5a5578119897",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "wwsun",
+      "messages": [],
+      "total_additions": 45,
+      "total_deletions": 25,
+      "accepted_lines": 45,
+      "overriden_lines": 0
+    },
+    "8fb428b1d6847ecc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "496730b1-700b-403a-8502-b57b5acf65ca",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "wwsun",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 53,
+      "overriden_lines": 6
+    },
+    "f985ffcd6ef0219e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8216ce5d-7565-466f-8ff3-748b4d6141e7",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "wwsun",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 54,
+      "overriden_lines": 7
+    }
+  }
+}
