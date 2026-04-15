@@ -336,11 +336,12 @@
 
 ### 推荐工具
 
-- `/score-app` — 生成前后端分离 Web 项目综合评分报告
+- `/web-security-expert` — OWASP Top 10 2025 系统化安全审计
+- `/security-scan` — 静态代码安全扫描
+- `/qa` - 全链路 QA + 自动修复
+- `/ship` - 一键检测 + 合并 + 部署
 - `/document-release` — 发布后自动同步 README、CHANGELOG、接口文档
-- `/ship` — 一键检测 + 合并 + 部署，包含前置门控
-- `/land-and-deploy` — 合并 PR 后等待 CI/CD 完成部署
-- `/canary` — 上线后实时监控，自动告警异常
+- `/score-app` — 生成前后端分离 Web 项目综合评分报告
 - `/retro` — 本期工程复盘，生成改进建议
 
 ### 产出与验收
