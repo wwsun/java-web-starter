@@ -1,32 +1,18 @@
 import axios from 'axios';
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { handleUnauthorized } from './tokenRefresher';
 
 /**
  * Axios 实例
  * - 请求拦截器：自动注入 Access Token
- * - 响应拦截器：精简返回结构，401 时自动换牌
+ * - 响应拦截器：精简返回结构，401 时自动换牌（由 tokenRefresher 处理）
  */
 const client: AxiosInstance = axios.create({
   baseURL: '/api',
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 });
-
-// 用于 token 刷新的裸 axios（不带业务拦截器，避免循环）
-const bareAxios = axios.create({
-  baseURL: '/api',
-  timeout: 15000,
-  headers: { 'Content-Type': 'application/json' },
-});
-
-// 刷新状态标志与等待队列
-let isRefreshing = false;
-let pendingRequests: Array<(token: string) => void> = [];
-
-function redirectToLogin() {
-  window.location.replace(`${window.location.origin}/#/login`);
-}
 
 // ==================== 请求拦截器 ====================
 client.interceptors.request.use(
@@ -58,56 +44,11 @@ client.interceptors.response.use(
     return data.data !== undefined ? data.data : data;
   },
   async (error) => {
-    if (error.response?.status !== 401) {
-      return Promise.reject(error);
+    if (error.response?.status === 401) {
+      return handleUnauthorized(error.config, client);
     }
-
-    const { refreshToken: rt, logout, setTokens } = useAuthStore.getState();
-    if (!rt) {
-      logout();
-      redirectToLogin();
-      return Promise.reject(error);
-    }
-
-    // 已有刷新在进行中，将当前请求加入等待队列
-    if (isRefreshing) {
-      return new Promise<unknown>((resolve) => {
-        pendingRequests.push((newToken: string) => {
-          if (error.config.headers) {
-            error.config.headers.Authorization = `Bearer ${newToken}`;
-          }
-          resolve(client(error.config));
-        });
-      });
-    }
-
-    isRefreshing = true;
-
-    try {
-      const res = await bareAxios.post('/auth/refresh', null, {
-        headers: { Authorization: `Bearer ${rt}` },
-      });
-      const { accessToken, refreshToken: newRefreshToken } = res.data.data;
-      setTokens(accessToken, newRefreshToken);
-
-      // 重试等待队列中的请求
-      pendingRequests.forEach((cb) => cb(accessToken));
-      pendingRequests = [];
-
-      // 重试原请求
-      if (error.config.headers) {
-        error.config.headers.Authorization = `Bearer ${accessToken}`;
-      }
-      return client(error.config);
-    } catch {
-      logout();
-      redirectToLogin();
-      return Promise.reject(error);
-    } finally {
-      isRefreshing = false;
-    }
+    return Promise.reject(error);
   }
 );
 
 export default client;
-

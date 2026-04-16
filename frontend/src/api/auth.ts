@@ -35,10 +35,4 @@ export function register(params: RegisterParams) {
   return client.post<void, void>('/auth/register', params);
 }
 
-/**
- * 刷新 Token
- */
-export function refreshToken() {
-  return client.post<TokenResponse, TokenResponse>('/auth/refresh');
-}
 
