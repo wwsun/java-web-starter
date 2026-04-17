@@ -30,7 +30,7 @@ docker compose up -d --build
 
 > 查看启动状态：`docker compose ps` · 查看后端日志：`docker compose logs -f backend`
 
-## 本地开发
+## 本地开发 (VS Code)
 
 **前置条件**：[sdkman](https://sdkman.io)、Node.js 20+、Docker 24+
 
@@ -78,6 +78,56 @@ source scripts/api.sh     # 加载工具（每个终端会话执行一次）
 api_health                # 检查后端是否运行
 api_get /api/users/me     # token 自动缓存，首次调用自动登录
 ```
+
+## 本地开发 (IntelliJ IDEA)
+
+**前置条件**：IntelliJ IDEA 2023+、JDK 21、Node.js 20+、Docker 24+
+
+**Step 0：安装 JDK 21**
+
+推荐通过 sdkman 安装（已安装跳过）：
+
+```bash
+cd backend && sdk env install
+```
+
+或手动下载 JDK 21，在 IDEA 中配置（File > Project Structure > SDKs）。
+
+**Step 1：导入项目**
+
+打开 IDEA，选择 **File > Open**，选择项目根目录下的 `backend/` 文件夹，IDEA 会自动识别 Maven 工程并下载依赖。
+
+**Step 2：配置 JDK 与注解处理**
+
+- **File > Project Structure > Project**：SDK 设为 JDK 21，Language level 设为 21
+- **Settings > Build > Compiler > Annotation Processors**：勾选 **Enable annotation processing**（Lombok 必须）
+
+**Step 3：启动数据库**
+
+```bash
+make dev-db
+```
+
+**Step 4：运行后端**
+
+找到 `StarterApplication`（`backend/src/main/java/com/music163/starter/StarterApplication.java`），右键 > **Run**。
+
+或创建 Run/Debug Configuration：
+
+- Main class：`com.music163.starter.StarterApplication`
+- Active profiles（Spring Boot 选项卡）：`dev`
+
+启动后访问 API 文档：http://localhost:8080/doc.html
+
+**Step 5：启动前端**（IDEA 内置终端或新终端）
+
+```bash
+make frontend
+# 浏览器访问 http://localhost:5173
+# 默认账号：admin / admin123
+```
+
+> 本地开发无需启动 Redis（dev profile 使用内存缓存）。
 
 ## 部署
 
